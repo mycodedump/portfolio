@@ -7,35 +7,39 @@
 <link rel="stylesheet" href="css/tokens.css">
 <link rel="stylesheet" href="css/shell.css">
 <link rel="stylesheet" href="css/home.css">
+<link rel="stylesheet" href="css/case-study.css">
 </head>
 <body>
 
 <div class="layout">
 
-  <!-- LEFT SIDEBAR -->
   <aside class="sidebar">
     <a href="index.html" class="sidebar-logo">LAXMI<br>MAHAJAN</a>
 
     <nav class="sidebar-nav" id="sidebarNav">
       <a href="#hero" class="nav-item active" data-section="hero">
-        <span class="nav-dot"></span>
-        <span class="nav-label">HOME</span>
+        <span class="nav-icon-slot">
+          <svg viewBox="0 0 16 16"><path d="M8 1.5 L14.5 7.5 L13 7.5 L13 14.5 L9.5 14.5 L9.5 10 L6.5 10 L6.5 14.5 L3 14.5 L3 7.5 L1.5 7.5 Z"/></svg>
+        </span>
+        <span class="nav-label">home</span>
       </a>
       <a href="#work" class="nav-item" data-section="work">
-        <span class="nav-dot"></span>
-        <span class="nav-label">WORK</span>
+        <span class="nav-icon-slot">
+          <svg viewBox="0 0 16 16"><path d="M1.5 5 L6 5 L7.2 6.5 L14.5 6.5 L14.5 13 L1.5 13 Z M1.5 5 L1.5 3.5 L5 3.5 L6 5"/></svg>
+        </span>
+        <span class="nav-label">PROJECTS</span>
       </a>
-      <a href="ai-playground.html" class="nav-item" data-section="ai">
-        <span class="nav-dot"></span>
+      <a href="#tinker" class="nav-item" data-section="tinker">
+        <span class="nav-icon-slot">
+          <svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5"/></svg>
+        </span>
         <span class="nav-label">AI PLAYGROUND</span>
       </a>
-      <a href="#about" class="nav-item" data-section="about">
-        <span class="nav-dot"></span>
-        <span class="nav-label">ABOUT</span>
-      </a>
-      <a href="#now" class="nav-item" data-section="now">
-        <span class="nav-dot"></span>
-        <span class="nav-label">NOW</span>
+      <a href="#writing" class="nav-item" data-section="writing">
+        <span class="nav-icon-slot">
+          <svg viewBox="0 0 16 16"><path d="M8 2 C11 3 12.5 5.5 11.5 8.5 C10.8 10.7 9 12.5 8 14 C7 12.5 5.2 10.7 4.5 8.5 C3.5 5.5 5 3 8 2 Z"/></svg>
+        </span>
+        <span class="nav-label">TINKERING HOBBIES</span>
       </a>
     </nav>
 
@@ -44,76 +48,94 @@
         <span class="toggle-track"><span class="toggle-thumb"></span></span>
         <span class="toggle-label">DARK</span>
       </button>
-      <a href="resume.pdf" class="resume-link" download>↓ RESUME</a>
+      <a href="resume.pdf" class="resume-link" download>RESUME</a>
+      <div class="footer-meta">
+        <a href="#">linkedin</a>
+        <a href="mailto:you@email.com">gmail</a>
+      </div>
     </div>
   </aside>
 
-  <!-- MAIN CONTENT -->
+  <div class="status-bar">
+    <span>BASED IN BANGALORE</span>
+    <span id="clockOut">IND</span>
+  </div>
+
   <main class="content">
 
     <section class="panel hero" id="hero">
-      <p class="eyebrow">PRODUCT DESIGNER · 2+ YEARS</p>
-      <h1 class="hero-headline">I design financial products people actually trust&nbsp;— while traveling, spending, and waiting in line for a visa.</h1>
-      <p class="hero-sub">Formerly at Canvs, designing for ICICI Bank's iMobile, Retail, and Global apps. Now looking for what's next.</p>
-      <div class="doodle doodle-hero" aria-hidden="true"></div>
+      <p class="hero-headline">
+        <em>product designer</em> based in bangalore — experience designed for delight, tinker with ai on the side, and run on the weekends. write something more here.
+      </p>
     </section>
 
     <section class="panel work" id="work">
-      <p class="section-label">SELECTED WORK</p>
+      <h2 class="work-title">SELECT PROJECTS</h2>
 
-      <a href="itravel.html" class="project-card" data-stamp="01">
-        <div class="card-content">
-          <span class="card-eyebrow">FEATURE DESIGN · ICICI BANK</span>
-          <h2 class="card-title">iTravel</h2>
-          <p class="card-desc">Redesigning how cardholders activate international transactions — closing a 30% decline rate before it happens.</p>
-        </div>
-        <div class="card-stamp">01</div>
-      </a>
+      <div class="project-stack">
+        <a href="#itravel" class="project-card">
+          <span class="case-tab">CASE STUDY 1</span>
+          <div class="card-thumb">[ screen placeholder ]</div>
+          <div class="card-content">
+            <span class="card-eyebrow">UX + UI · SOLE DESIGNER</span>
+            <h3 class="card-title">iTravel — international transactions, reimagined for ICICI cardholders</h3>
+            <span class="card-status">STATUS — UNDER REVIEW</span>
+          </div>
+        </a>
 
-      <a href="design-system.html" class="project-card" data-stamp="02">
-        <div class="card-content">
-          <span class="card-eyebrow">DESIGN SYSTEMS · ICICI BANK</span>
-          <h2 class="card-title">Design System &amp; Extended Services</h2>
-          <p class="card-desc">Bringing consistency across iMobile and Retail web — components, patterns, and the governance to keep them alive.</p>
-        </div>
-        <div class="card-stamp">02</div>
-      </a>
+        <a href="#design-system" class="project-card">
+          <span class="case-tab">CASE STUDY 2</span>
+          <div class="card-content">
+            <span class="card-eyebrow">UX + UI · TEAM PROJECT</span>
+            <h3 class="card-title">Design system &amp; extended services for iMobile and Retail</h3>
+            <span class="card-status">STATUS — LIVE</span>
+          </div>
+          <div class="card-thumb">[ screen placeholder ]</div>
+        </a>
 
-      <a href="viisa.html" class="project-card" data-stamp="03">
-        <div class="card-content">
-          <span class="card-eyebrow">FREELANCE · 0→1</span>
-          <h2 class="card-title">Viisa</h2>
-          <p class="card-desc">End-to-end product design for a visa processing service, built solo for an independent client.</p>
-        </div>
-        <div class="card-stamp">03</div>
-      </a>
+        <a href="#viisa" class="project-card">
+          <span class="case-tab">CASE STUDY 3</span>
+          <div class="card-thumb">[ screen placeholder ]</div>
+          <div class="card-content">
+            <span class="card-eyebrow">UX + UI · SOLE DESIGNER · FREELANCE</span>
+            <h3 class="card-title">Viisa — a visa processing experience, built solo</h3>
+            <span class="card-status">STATUS — SHIPPED</span>
+          </div>
+        </a>
+      </div>
     </section>
 
-    <section class="panel about" id="about">
-      <p class="section-label">ABOUT</p>
-      <p class="about-text">Two years at Canvs taught me that good fintech design is mostly invisible — it's the decline that didn't happen, the OTP that arrived on time, the limit that was set correctly the first time. I care about the parts of a product nobody notices, because that's usually where trust is actually built.</p>
-      <div class="doodle doodle-about" aria-hidden="true"></div>
+    <section class="panel tinker" id="tinker">
+      <h2 class="tinker-title">sometimes i tinker with ai</h2>
+      <p class="tinker-sub">these are all the things i build out of sheer curiosity and cope with anxiety</p>
+      <div class="tinker-grid">
+        <div class="tinker-card">
+          <p class="tinker-card-title">title</p>
+          <p class="tinker-card-desc">something about this project</p>
+        </div>
+        <div class="tinker-card">
+          <p class="tinker-card-title">title</p>
+          <p class="tinker-card-desc">something about this project</p>
+        </div>
+        <div class="tinker-card">
+          <p class="tinker-card-title">title</p>
+          <p class="tinker-card-desc">something about this project</p>
+        </div>
+      </div>
     </section>
 
-    <section class="panel now" id="now">
-      <p class="section-label">OUTSIDE OF WORK</p>
-      <div class="now-grid">
-        <div class="now-card">
-          <span class="now-label">WATCHING</span>
-          <p class="now-placeholder">[ add 2-3 films/shows ]</p>
-        </div>
-        <div class="now-card">
-          <span class="now-label">LISTENING</span>
-          <p class="now-placeholder">[ add artists/albums ]</p>
-        </div>
-        <div class="now-card">
-          <span class="now-label">IN BENGALURU</span>
-          <p class="now-placeholder">[ add a favourite spot or two ]</p>
-        </div>
-        <div class="now-card">
-          <span class="now-label">WRITING</span>
-          <p class="now-placeholder">[ link an essay/post if you have one ]</p>
-        </div>
+    <section class="panel writing" id="writing">
+      <div>
+        <p class="writing-label">I WRITE, SOMETIMES</p>
+        <h2 class="writing-title">I do have opinions on my notepad, thought others should read it too</h2>
+      </div>
+      <div class="writing-grid">
+        <div class="writing-card"><p class="writing-card-topic">TOPIC NAME IS ONLY SUPPOSED TO BE 2 LINES</p></div>
+        <div class="writing-card"><p class="writing-card-topic">TOPIC NAME IS ONLY SUPPOSED TO BE 2 LINES</p></div>
+        <div class="writing-card"><p class="writing-card-topic">TOPIC NAME IS ONLY SUPPOSED TO BE 2 LINES</p></div>
+        <div class="writing-card"><p class="writing-card-topic">TOPIC NAME IS ONLY SUPPOSED TO BE 2 LINES</p></div>
+        <div class="writing-card"><p class="writing-card-topic">TOPIC NAME IS ONLY SUPPOSED TO BE 2 LINES</p></div>
+        <div class="writing-card"><p class="writing-card-topic">TOPIC NAME IS ONLY SUPPOSED TO BE 2 LINES</p></div>
       </div>
     </section>
 
@@ -129,7 +151,135 @@
   </main>
 </div>
 
+<!-- ============ CASE STUDY MODALS ============ -->
+<div class="cs-backdrop" id="csBackdrop"></div>
+
+<div class="cs-panel" id="panel-itravel">
+  <div class="cs-panel-inner">
+    <button class="cs-close">← CLOSE</button>
+
+    <p class="cs-eyebrow">FEATURE DESIGN · ICICI BANK</p>
+    <h1 class="cs-title">iTravel</h1>
+    <p class="cs-subtitle">Fixing a 30% international transaction decline rate on ICICI credit cards.</p>
+
+    <div class="cs-meta">
+      <div class="cs-meta-item">
+        <span class="cs-meta-label">Role</span>
+        <span class="cs-meta-value">Sole UX/UI Designer</span>
+      </div>
+      <div class="cs-meta-item">
+        <span class="cs-meta-label">Team</span>
+        <span class="cs-meta-value">PM, Engineering, Risk &amp; Compliance</span>
+      </div>
+      <div class="cs-meta-item">
+        <span class="cs-meta-label">Status</span>
+        <span class="cs-meta-value">With client, pre-launch</span>
+      </div>
+    </div>
+
+    <div class="cs-image-slot">[ hero screen ]</div>
+
+    <div class="cs-section">
+      <p class="cs-section-label">The problem</p>
+      <p>ICICI credit cards decline 30% of international transactions. Not a card-network issue — by RBI mandate, every card ships with international usage off by default, reversible only by the user, manually, inside the app.</p>
+      <p>Result: a customer taps their card abroad, gets declined, has no idea the setting exists.</p>
+    </div>
+
+    <div class="cs-stat-row">
+      <div class="cs-stat">
+        <p class="cs-stat-number">30%</p>
+        <p class="cs-stat-label">international transactions declined</p>
+      </div>
+      <div class="cs-stat">
+        <p class="cs-stat-number">1</p>
+        <p class="cs-stat-label">sole designer, end to end</p>
+      </div>
+    </div>
+
+    <div class="cs-section">
+      <p class="cs-section-label">3 HMWs guiding the work</p>
+      <p>1. Make activation easy and confidence-building<br>
+      2. Get genuine transactions approved seamlessly<br>
+      3. Give users one view for all international travel issues</p>
+    </div>
+
+    <div class="cs-section">
+      <h2>Why "just surface the toggle" isn't the fix</h2>
+      <p>RBI requires separate toggles for POS, ATM, and e-commerce. A user enabling POS still gets silently declined buying online. On top of that, the fraud engine checks transaction plausibility, not just whether the toggle is on.</p>
+      <p>Real problem: the bank has no signal a customer is traveling until they're already declined. iTravel closes that gap before the trip starts.</p>
+    </div>
+
+    <div class="cs-section">
+      <p class="cs-section-label">Key decisions</p>
+
+      <div class="cs-decision">
+        <p class="cs-decision-label">Decision 1</p>
+        <h3>Multi-channel activation, not one screen</h3>
+        <p>Most users barely open iMobile anymore — bill payments increasingly happen via CRED. An in-app-only entry point reaches almost nobody. Built activation across dashboard, manage cards, plus Instagram and email campaigns, branching by install state and whether the user already holds a card.</p>
+        <p>The drawer is a forced interstitial, deliberately — the user clicked an ad specifically for iTravel, so a dashboard detour would be the actual friction.</p>
+      </div>
+
+      <div class="cs-decision">
+        <p class="cs-decision-label">Decision 2</p>
+        <h3>Layover capture for fraud plausibility</h3>
+        <p>The brief asked for destination + dates. I added layover/transit stops — my proposal, not in the brief. Fraud engines flag transactions that look geographically implausible. A declared trip — India → Singapore (layover) → Japan — gives the engine a trail to match, so the Tokyo swipe reads as expected, not anomalous.</p>
+      </div>
+
+      <div class="cs-decision">
+        <p class="cs-decision-label">Decision 3</p>
+        <h3>Live conversion rate on the limit slider</h3>
+        <p>Card control limits shown as a slider with a live conversion-rate label for the destination currency — removing mental currency math, preventing under-set limits that look fine in INR but aren't, and surfacing a natural credit-limit-increase upsell when intended spend exceeds the current limit.</p>
+      </div>
+
+      <div class="cs-decision">
+        <p class="cs-decision-label">Decision 4</p>
+        <h3>Three notification channels, not one</h3>
+        <p>Travelers swap to local SIMs or data-only eSIMs abroad. One default number becomes a single point of failure for OTP delivery. Users choose between email, WhatsApp, or an international number — email also persists as a searchable record long after the trip ends.</p>
+      </div>
+
+      <div class="cs-decision">
+        <p class="cs-decision-label">Decision 5</p>
+        <h3>Auto-expiring controls</h3>
+        <p>RBI mandates manual activation but says nothing about deactivation — left alone, people forget to turn it off. Proposed international access auto-expiring when the declared trip ends, shrinking the fraud window to exactly the trip and removing the "am I committing forever" hesitation.</p>
+      </div>
+
+      <div class="cs-decision">
+        <p class="cs-decision-label">Decision 6</p>
+        <h3>A summary screen, not a dead end</h3>
+        <p>Active trips show as a live card on the dashboard. Post-trip: a Spotify-Wrapped-style summary — spend recap, country stamps, entry into travel history. Turns a one-time setup flow into something worth returning to.</p>
+      </div>
+    </div>
+
+    <div class="cs-image-slot">[ key flow screens ]</div>
+
+    <div class="cs-section">
+      <p class="cs-section-label">Status</p>
+      <p>Design finalized through multiple iteration rounds, currently with the client for review. Not yet shipped — no post-launch data exists yet. The number this is designed against is still the 30% decline it set out to fix.</p>
+    </div>
+  </div>
+</div>
+
+<div class="cs-panel" id="panel-design-system">
+  <div class="cs-panel-inner">
+    <button class="cs-close">← CLOSE</button>
+    <p class="cs-eyebrow">DESIGN SYSTEMS · ICICI BANK</p>
+    <h1 class="cs-title">Design System &amp; Extended Services</h1>
+    <p class="cs-subtitle">[ content pending — let's build this one next ]</p>
+  </div>
+</div>
+
+<div class="cs-panel" id="panel-viisa">
+  <div class="cs-panel-inner">
+    <button class="cs-close">← CLOSE</button>
+    <p class="cs-eyebrow">FREELANCE · 0→1</p>
+    <h1 class="cs-title">Viisa</h1>
+    <p class="cs-subtitle">[ content pending ]</p>
+  </div>
+</div>
+
 <script src="js/theme.js"></script>
+<script src="js/clock.js"></script>
 <script src="js/scrollspy.js"></script>
+<script src="js/case-study.js"></script>
 </body>
 </html>

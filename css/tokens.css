@@ -38,6 +38,9 @@
   --color-accent-tertiary: var(--light-sage);
   --color-border: var(--light-olive);
   --color-card-bg: var(--light-sage);
+  --color-card-tint-sage: #D2CE93;
+  --color-card-tint-rust: #D19761;
+  --color-card-tint-rose: #EBC7CF;
   --color-inverse-bg: var(--light-ink);
   --color-inverse-text: var(--light-cream);
 

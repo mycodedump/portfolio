@@ -11,7 +11,7 @@
 </head>
 <body>
 
-<div class="layout">
+<div class="frame">
 
   <aside class="sidebar">
     <a href="index.html" class="sidebar-logo">LAXMI<br>MAHAJAN</a>
@@ -19,136 +19,140 @@
     <nav class="sidebar-nav" id="sidebarNav">
       <a href="#hero" class="nav-item active" data-section="hero">
         <span class="nav-icon-slot">
-          <svg viewBox="0 0 16 16"><path d="M8 1.5 L14.5 7.5 L13 7.5 L13 14.5 L9.5 14.5 L9.5 10 L6.5 10 L6.5 14.5 L3 14.5 L3 7.5 L1.5 7.5 Z"/></svg>
+          <svg viewBox="0 0 10 10" class="icon-triangle"><polygon points="5,1 9,8 1,8"/></svg>
         </span>
         <span class="nav-label">home</span>
       </a>
       <a href="#work" class="nav-item" data-section="work">
         <span class="nav-icon-slot">
-          <svg viewBox="0 0 16 16"><path d="M1.5 5 L6 5 L7.2 6.5 L14.5 6.5 L14.5 13 L1.5 13 Z M1.5 5 L1.5 3.5 L5 3.5 L6 5"/></svg>
+          <svg viewBox="0 0 10 14" class="icon-diamonds"><polygon points="5,0 9,3 5,6 1,3"/><polygon points="5,8 9,11 5,14 1,11"/></svg>
         </span>
         <span class="nav-label">PROJECTS</span>
       </a>
       <a href="#tinker" class="nav-item" data-section="tinker">
         <span class="nav-icon-slot">
-          <svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5"/></svg>
+          <svg viewBox="0 0 10 10" class="icon-dot"><circle cx="5" cy="5" r="4"/></svg>
         </span>
         <span class="nav-label">AI PLAYGROUND</span>
       </a>
       <a href="#writing" class="nav-item" data-section="writing">
         <span class="nav-icon-slot">
-          <svg viewBox="0 0 16 16"><path d="M8 2 C11 3 12.5 5.5 11.5 8.5 C10.8 10.7 9 12.5 8 14 C7 12.5 5.2 10.7 4.5 8.5 C3.5 5.5 5 3 8 2 Z"/></svg>
+          <svg viewBox="0 0 10 14" class="icon-dots"><circle cx="5" cy="4" r="3.5"/><circle cx="5" cy="11" r="3.5"/></svg>
         </span>
         <span class="nav-label">TINKERING HOBBIES</span>
       </a>
     </nav>
 
     <div class="sidebar-footer">
-      <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-        <span class="toggle-track"><span class="toggle-thumb"></span></span>
-        <span class="toggle-label">DARK</span>
-      </button>
       <a href="resume.pdf" class="resume-link" download>RESUME</a>
       <div class="footer-meta">
         <a href="#">linkedin</a>
+        <span class="dot-sep"></span>
         <a href="mailto:you@email.com">gmail</a>
       </div>
     </div>
   </aside>
 
-  <div class="status-bar">
-    <span>BASED IN BANGALORE</span>
-    <span id="clockOut">IND</span>
+  <div class="canvas">
+
+    <div class="status-bar">
+      <span>BASED IN BANGALORE</span>
+      <span id="clockOut">IND — 10.34 AM</span>
+    </div>
+
+    <main class="content">
+
+      <section class="panel hero" id="hero">
+        <p class="hero-headline">
+          <em>product designer</em> based in bangalore experience designed experiences for delight, tinker with ai on the side and run on the weekends, write something more here
+        </p>
+      </section>
+
+      <section class="panel work" id="work">
+        <h2 class="work-title">SELECT PROJECTS</h2>
+
+        <div class="folder-stack" id="folderStack">
+
+          <a href="#itravel" class="folder-card" data-index="0" style="--card-color: var(--light-sage); --card-tint: var(--color-card-tint-sage);">
+            <span class="folder-tab">CASE STUDY 1</span>
+            <div class="folder-body">
+              <div class="folder-thumb">[ screen ]</div>
+              <div class="folder-content">
+                <span class="folder-eyebrow">UX + UI &nbsp;•&nbsp; SOLE DESIGNER</span>
+                <h3 class="folder-title">iTravel — international transactions, reimagined for ICICI cardholders</h3>
+                <span class="folder-status">STATUS — UNDER REVIEW</span>
+              </div>
+            </div>
+          </a>
+
+          <a href="#design-system" class="folder-card" data-index="1" style="--card-color: var(--light-rust); --card-tint: var(--color-card-tint-rust);">
+            <span class="folder-tab">CASE STUDY 2</span>
+            <div class="folder-body folder-body--reverse">
+              <div class="folder-content">
+                <span class="folder-eyebrow">UX + UI &nbsp;•&nbsp; TEAM PROJECT</span>
+                <h3 class="folder-title">Design system &amp; extended services for iMobile and Retail</h3>
+                <span class="folder-status">STATUS — LIVE</span>
+              </div>
+              <div class="folder-thumb">[ screen ]</div>
+            </div>
+          </a>
+
+          <a href="#viisa" class="folder-card" data-index="2" style="--card-color: var(--light-rose); --card-tint: var(--color-card-tint-rose);">
+            <span class="folder-tab">CASE STUDY 3</span>
+            <div class="folder-body">
+              <div class="folder-thumb">[ screen ]</div>
+              <div class="folder-content">
+                <span class="folder-eyebrow">UX + UI &nbsp;•&nbsp; SOLE DESIGNER · FREELANCE</span>
+                <h3 class="folder-title">Viisa — a visa processing experience, built solo</h3>
+                <span class="folder-status">STATUS — SHIPPED</span>
+              </div>
+            </div>
+          </a>
+
+        </div>
+      </section>
+
+      <section class="panel tinker" id="tinker">
+        <h2 class="tinker-title">sometimes i tinker with ai</h2>
+        <p class="tinker-sub">these are all the things i build out of sheer curiosity and cope with anxiety</p>
+        <div class="tinker-grid">
+          <div class="tinker-card">
+            <p class="tinker-card-title">title</p>
+            <p class="tinker-card-desc">something about this project</p>
+          </div>
+          <div class="tinker-card">
+            <p class="tinker-card-title">title</p>
+            <p class="tinker-card-desc">something about this project</p>
+          </div>
+          <div class="tinker-card">
+            <p class="tinker-card-title">title</p>
+            <p class="tinker-card-desc">something about this project</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel hobbies" id="hobbies">
+        <div class="hobbies-photo-strip">[ photo collage of hobbies goes here ]</div>
+        <p class="hobbies-caption">we're on a mission to bring it to life.</p>
+      </section>
+
+      <section class="panel writing" id="writing">
+        <div class="writing-intro">
+          <p class="writing-label">I WRITE, SOMETIMES</p>
+          <h2 class="writing-title">I do have opinions on my notepad, thought other's should read it too</h2>
+        </div>
+        <div class="writing-grid">
+          <div class="writing-card writing-card--sage"><p class="writing-card-topic">TOPIC NAME IS ONLY SUPPOSED TO BE 2 LINES</p></div>
+          <div class="writing-card writing-card--rose"><p class="writing-card-topic">TOPIC NAME IS ONLY SUPPOSED TO BE 2 LINES</p></div>
+          <div class="writing-card writing-card--sage"><p class="writing-card-topic">TOPIC NAME IS ONLY SUPPOSED TO BE 2 LINES</p></div>
+          <div class="writing-card writing-card--rose"><p class="writing-card-topic">TOPIC NAME IS ONLY SUPPOSED TO BE 2 LINES</p></div>
+          <div class="writing-card writing-card--sage"><p class="writing-card-topic">TOPIC NAME IS ONLY SUPPOSED TO BE 2 LINES</p></div>
+          <div class="writing-card writing-card--rose"><p class="writing-card-topic">TOPIC NAME IS ONLY SUPPOSED TO BE 2 LINES</p></div>
+        </div>
+      </section>
+
+    </main>
   </div>
-
-  <main class="content">
-
-    <section class="panel hero" id="hero">
-      <p class="hero-headline">
-        <em>product designer</em> based in bangalore — experience designed for delight, tinker with ai on the side, and run on the weekends. write something more here.
-      </p>
-    </section>
-
-    <section class="panel work" id="work">
-      <h2 class="work-title">SELECT PROJECTS</h2>
-
-      <div class="project-stack">
-        <a href="#itravel" class="project-card">
-          <span class="case-tab">CASE STUDY 1</span>
-          <div class="card-thumb">[ screen placeholder ]</div>
-          <div class="card-content">
-            <span class="card-eyebrow">UX + UI · SOLE DESIGNER</span>
-            <h3 class="card-title">iTravel — international transactions, reimagined for ICICI cardholders</h3>
-            <span class="card-status">STATUS — UNDER REVIEW</span>
-          </div>
-        </a>
-
-        <a href="#design-system" class="project-card">
-          <span class="case-tab">CASE STUDY 2</span>
-          <div class="card-content">
-            <span class="card-eyebrow">UX + UI · TEAM PROJECT</span>
-            <h3 class="card-title">Design system &amp; extended services for iMobile and Retail</h3>
-            <span class="card-status">STATUS — LIVE</span>
-          </div>
-          <div class="card-thumb">[ screen placeholder ]</div>
-        </a>
-
-        <a href="#viisa" class="project-card">
-          <span class="case-tab">CASE STUDY 3</span>
-          <div class="card-thumb">[ screen placeholder ]</div>
-          <div class="card-content">
-            <span class="card-eyebrow">UX + UI · SOLE DESIGNER · FREELANCE</span>
-            <h3 class="card-title">Viisa — a visa processing experience, built solo</h3>
-            <span class="card-status">STATUS — SHIPPED</span>
-          </div>
-        </a>
-      </div>
-    </section>
-
-    <section class="panel tinker" id="tinker">
-      <h2 class="tinker-title">sometimes i tinker with ai</h2>
-      <p class="tinker-sub">these are all the things i build out of sheer curiosity and cope with anxiety</p>
-      <div class="tinker-grid">
-        <div class="tinker-card">
-          <p class="tinker-card-title">title</p>
-          <p class="tinker-card-desc">something about this project</p>
-        </div>
-        <div class="tinker-card">
-          <p class="tinker-card-title">title</p>
-          <p class="tinker-card-desc">something about this project</p>
-        </div>
-        <div class="tinker-card">
-          <p class="tinker-card-title">title</p>
-          <p class="tinker-card-desc">something about this project</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="panel writing" id="writing">
-      <div>
-        <p class="writing-label">I WRITE, SOMETIMES</p>
-        <h2 class="writing-title">I do have opinions on my notepad, thought others should read it too</h2>
-      </div>
-      <div class="writing-grid">
-        <div class="writing-card"><p class="writing-card-topic">TOPIC NAME IS ONLY SUPPOSED TO BE 2 LINES</p></div>
-        <div class="writing-card"><p class="writing-card-topic">TOPIC NAME IS ONLY SUPPOSED TO BE 2 LINES</p></div>
-        <div class="writing-card"><p class="writing-card-topic">TOPIC NAME IS ONLY SUPPOSED TO BE 2 LINES</p></div>
-        <div class="writing-card"><p class="writing-card-topic">TOPIC NAME IS ONLY SUPPOSED TO BE 2 LINES</p></div>
-        <div class="writing-card"><p class="writing-card-topic">TOPIC NAME IS ONLY SUPPOSED TO BE 2 LINES</p></div>
-        <div class="writing-card"><p class="writing-card-topic">TOPIC NAME IS ONLY SUPPOSED TO BE 2 LINES</p></div>
-      </div>
-    </section>
-
-    <footer class="site-footer">
-      <p>BASED IN BENGALURU · OPEN TO RELOCATION</p>
-      <div class="footer-links">
-        <a href="mailto:you@email.com">EMAIL</a>
-        <a href="#">LINKEDIN</a>
-        <a href="#">GITHUB</a>
-      </div>
-    </footer>
-
-  </main>
 </div>
 
 <!-- ============ CASE STUDY MODALS ============ -->
@@ -277,9 +281,9 @@
   </div>
 </div>
 
-<script src="js/theme.js"></script>
 <script src="js/clock.js"></script>
 <script src="js/scrollspy.js"></script>
+<script src="js/folder-stack.js"></script>
 <script src="js/case-study.js"></script>
 </body>
 </html>

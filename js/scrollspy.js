@@ -1,10 +1,7 @@
-// Scrollspy: tracks which section is in view, marks the matching
-// sidebar item active. The icon crossfades in via CSS (see shell.css);
-// this script only toggles the .active class.
+// Tracks which section is in view, marks the matching sidebar item active.
 (function () {
   const sections = document.querySelectorAll('.panel[id]');
   const navItems = document.querySelectorAll('.nav-item[data-section]');
-
   if (!sections.length || !navItems.length) return;
 
   const navMap = {};

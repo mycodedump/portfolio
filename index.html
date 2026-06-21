@@ -3,85 +3,133 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Portfolio — Product Designer</title>
+<title>Laxmi Mahajan — Product Designer</title>
 <link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/shell.css">
 <link rel="stylesheet" href="css/home.css">
 </head>
 <body>
 
-<header class="site-header">
-  <div class="header-inner">
-    <a href="index.html" class="logo">YOUR NAME</a>
-    <nav class="header-nav">
-      <a href="#work">WORK</a>
-      <a href="#about">ABOUT</a>
-      <a href="mailto:you@email.com">CONTACT</a>
+<div class="layout">
+
+  <!-- LEFT SIDEBAR -->
+  <aside class="sidebar">
+    <a href="index.html" class="sidebar-logo">LAXMI<br>MAHAJAN</a>
+
+    <nav class="sidebar-nav" id="sidebarNav">
+      <a href="#hero" class="nav-item active" data-section="hero">
+        <span class="nav-dot"></span>
+        <span class="nav-label">HOME</span>
+      </a>
+      <a href="#work" class="nav-item" data-section="work">
+        <span class="nav-dot"></span>
+        <span class="nav-label">WORK</span>
+      </a>
+      <a href="ai-playground.html" class="nav-item" data-section="ai">
+        <span class="nav-dot"></span>
+        <span class="nav-label">AI PLAYGROUND</span>
+      </a>
+      <a href="#about" class="nav-item" data-section="about">
+        <span class="nav-dot"></span>
+        <span class="nav-label">ABOUT</span>
+      </a>
+      <a href="#now" class="nav-item" data-section="now">
+        <span class="nav-dot"></span>
+        <span class="nav-label">NOW</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
       <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-        <span class="toggle-track">
-          <span class="toggle-thumb"></span>
-        </span>
+        <span class="toggle-track"><span class="toggle-thumb"></span></span>
         <span class="toggle-label">DARK</span>
       </button>
-    </nav>
-  </div>
-</header>
+      <a href="resume.pdf" class="resume-link" download>↓ RESUME</a>
+    </div>
+  </aside>
 
-<main>
+  <!-- MAIN CONTENT -->
+  <main class="content">
 
-  <section class="hero">
-    <p class="eyebrow">PRODUCT DESIGNER · 2+ YEARS</p>
-    <h1 class="hero-headline">I design financial products people actually trust while traveling, spending, and waiting in line for a visa.</h1>
-    <p class="hero-sub">Formerly at Canvs, designing for ICICI Bank's iMobile, Retail, and Global apps. Now looking for what's next.</p>
-  </section>
+    <section class="panel hero" id="hero">
+      <p class="eyebrow">PRODUCT DESIGNER · 2+ YEARS</p>
+      <h1 class="hero-headline">I design financial products people actually trust&nbsp;— while traveling, spending, and waiting in line for a visa.</h1>
+      <p class="hero-sub">Formerly at Canvs, designing for ICICI Bank's iMobile, Retail, and Global apps. Now looking for what's next.</p>
+      <div class="doodle doodle-hero" aria-hidden="true"></div>
+    </section>
 
-  <section class="work" id="work">
-    <p class="section-label">SELECTED WORK</p>
+    <section class="panel work" id="work">
+      <p class="section-label">SELECTED WORK</p>
 
-    <a href="itravel.html" class="project-card stamp-card" data-stamp="01">
-      <div class="card-content">
-        <span class="card-eyebrow">FEATURE DESIGN · ICICI BANK</span>
-        <h2 class="card-title">iTravel</h2>
-        <p class="card-desc">Redesigning how cardholders activate international transactions — closing a 30% decline rate before it happens.</p>
+      <a href="itravel.html" class="project-card" data-stamp="01">
+        <div class="card-content">
+          <span class="card-eyebrow">FEATURE DESIGN · ICICI BANK</span>
+          <h2 class="card-title">iTravel</h2>
+          <p class="card-desc">Redesigning how cardholders activate international transactions — closing a 30% decline rate before it happens.</p>
+        </div>
+        <div class="card-stamp">01</div>
+      </a>
+
+      <a href="design-system.html" class="project-card" data-stamp="02">
+        <div class="card-content">
+          <span class="card-eyebrow">DESIGN SYSTEMS · ICICI BANK</span>
+          <h2 class="card-title">Design System &amp; Extended Services</h2>
+          <p class="card-desc">Bringing consistency across iMobile and Retail web — components, patterns, and the governance to keep them alive.</p>
+        </div>
+        <div class="card-stamp">02</div>
+      </a>
+
+      <a href="viisa.html" class="project-card" data-stamp="03">
+        <div class="card-content">
+          <span class="card-eyebrow">FREELANCE · 0→1</span>
+          <h2 class="card-title">Viisa</h2>
+          <p class="card-desc">End-to-end product design for a visa processing service, built solo for an independent client.</p>
+        </div>
+        <div class="card-stamp">03</div>
+      </a>
+    </section>
+
+    <section class="panel about" id="about">
+      <p class="section-label">ABOUT</p>
+      <p class="about-text">Two years at Canvs taught me that good fintech design is mostly invisible — it's the decline that didn't happen, the OTP that arrived on time, the limit that was set correctly the first time. I care about the parts of a product nobody notices, because that's usually where trust is actually built.</p>
+      <div class="doodle doodle-about" aria-hidden="true"></div>
+    </section>
+
+    <section class="panel now" id="now">
+      <p class="section-label">OUTSIDE OF WORK</p>
+      <div class="now-grid">
+        <div class="now-card">
+          <span class="now-label">WATCHING</span>
+          <p class="now-placeholder">[ add 2-3 films/shows ]</p>
+        </div>
+        <div class="now-card">
+          <span class="now-label">LISTENING</span>
+          <p class="now-placeholder">[ add artists/albums ]</p>
+        </div>
+        <div class="now-card">
+          <span class="now-label">IN BENGALURU</span>
+          <p class="now-placeholder">[ add a favourite spot or two ]</p>
+        </div>
+        <div class="now-card">
+          <span class="now-label">WRITING</span>
+          <p class="now-placeholder">[ link an essay/post if you have one ]</p>
+        </div>
       </div>
-      <div class="card-stamp">01</div>
-    </a>
+    </section>
 
-    <a href="design-system.html" class="project-card stamp-card" data-stamp="02">
-      <div class="card-content">
-        <span class="card-eyebrow">DESIGN SYSTEMS · ICICI BANK</span>
-        <h2 class="card-title">Design System &amp; Extended Services</h2>
-        <p class="card-desc">Bringing consistency across iMobile and Retail web — components, patterns, and the governance to keep them alive.</p>
+    <footer class="site-footer">
+      <p>BASED IN BENGALURU · OPEN TO RELOCATION</p>
+      <div class="footer-links">
+        <a href="mailto:you@email.com">EMAIL</a>
+        <a href="#">LINKEDIN</a>
+        <a href="#">GITHUB</a>
       </div>
-      <div class="card-stamp">02</div>
-    </a>
+    </footer>
 
-    <a href="viisa.html" class="project-card stamp-card" data-stamp="03">
-      <div class="card-content">
-        <span class="card-eyebrow">FREELANCE · 0→1</span>
-        <h2 class="card-title">Viisa</h2>
-        <p class="card-desc">End-to-end product design for a visa processing service, built solo for an independent client.</p>
-      </div>
-      <div class="card-stamp">03</div>
-    </a>
-
-  </section>
-
-  <section class="about" id="about">
-    <p class="section-label">ABOUT</p>
-    <p class="about-text">Two years at Canvs taught me that good fintech design is mostly invisible — it's the decline that didn't happen, the OTP that arrived on time, the limit that was set correctly the first time. I care about the parts of a product nobody notices, because that's usually where trust is actually built.</p>
-  </section>
-
-</main>
-
-<footer class="site-footer">
-  <p>BASED IN BENGALURU · OPEN TO RELOCATION</p>
-  <div class="footer-links">
-    <a href="mailto:you@email.com">EMAIL</a>
-    <a href="#">LINKEDIN</a>
-    <a href="#">GITHUB</a>
-  </div>
-</footer>
+  </main>
+</div>
 
 <script src="js/theme.js"></script>
+<script src="js/scrollspy.js"></script>
 </body>
 </html>

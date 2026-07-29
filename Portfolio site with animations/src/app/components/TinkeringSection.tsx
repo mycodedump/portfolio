@@ -88,14 +88,6 @@ export function TinkeringSection() {
         onNavigate={(p) => setSelectedPost(p)}
       />
 
-      <div ref={photoRef} style={{ width: "100%", height: 543, overflow: "hidden", position: "relative" }}>
-        <motion.img
-          src={imgPhoto}
-          alt="Portfolio photo"
-          style={{ position: "absolute", width: "117.95%", left: "-8.97%", top: -80, height: 703, objectFit: "cover", y: imageY }}
-        />
-      </div>
-
       <div style={{ padding: isMobile ? "28px 16px 60px" : "40px 40px 80px" }}>
         <div style={{ marginBottom: 28 }}>
           <p className="font-jakarta font-medium uppercase" style={{ fontSize: 12, letterSpacing: "0.48px", color: "#625e37", marginBottom: 8 }}>

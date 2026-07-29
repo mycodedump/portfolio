@@ -446,7 +446,7 @@ export function PersonalSection({ onAboutOpen }: PersonalSectionProps) {
   const [hovAbout, setHovAbout] = useState(false);
 
   return (
-    <section style={{ padding: isMobile ? "60px 16px 80px" : "80px 40px 100px" }}>
+    <section style={{ padding: isMobile ? "32px 16px 32px" : "40px 40px 40px" }}>
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         whileInView={{ opacity: 1, y: 0 }}

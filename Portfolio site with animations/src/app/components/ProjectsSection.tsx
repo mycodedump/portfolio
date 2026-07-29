@@ -434,7 +434,7 @@ export function ProjectsSection({ onDrawerChange }: { onDrawerChange?: (open: bo
           style={{
             position: "sticky",
             top: 0,
-            height: "70vh",
+            height: "100vh",
             overflow: "hidden",
             backgroundColor: "#212012",
             borderRadius: "16px",

@@ -17,6 +17,9 @@ function figmaAssetResolver() {
 }
 
 export default defineConfig({
+  // Replace 'REPO_NAME' with your GitHub repo name (must match exactly, case-sensitive).
+  // Required so asset URLs resolve correctly at username.github.io/REPO_NAME/
+  base: '/portfolio/',
   plugins: [
     figmaAssetResolver(),
     // The React and Tailwind plugins are both required for Make, even if

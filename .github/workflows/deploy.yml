@@ -17,6 +17,9 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: "Portfolio site with animations"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -29,6 +32,7 @@ jobs:
         with:
           node-version: 20
           cache: pnpm
+          cache-dependency-path: "Portfolio site with animations/pnpm-lock.yaml"
 
       - name: Install dependencies
         run: pnpm install
@@ -42,7 +46,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dist
+          path: "Portfolio site with animations/dist"
 
       - name: Deploy to GitHub Pages
         id: deployment

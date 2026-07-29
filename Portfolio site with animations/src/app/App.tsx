@@ -13,7 +13,7 @@ import { MobileBottomNav } from "./components/MobileBottomNav";
 import { AnimationLabPage } from "./components/AnimationLabPage";
 import { CatMascot } from "./components/CatMascot";
 import { useIsMobile } from "./useIsMobile";
- 
+
 // ── 0→100% site loading bar ───────────────────────────────────────────────────
 // Fixed to the bottom of the viewport, fills left-to-right with a palette gradient,
 // then fades out. Signals "page ready" without blocking interaction.

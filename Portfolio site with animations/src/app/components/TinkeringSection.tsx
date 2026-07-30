@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { motion, useTransform, AnimatePresence } from "motion/react";
 import { useScrollProgress } from "../ScrollContext";
 import { useIsMobile } from "../useIsMobile";
@@ -18,6 +18,13 @@ import { BlogPostDrawer } from "./BlogPostDrawer";
 import imgPhoto from "figma:asset/4dfdf49b488289ec55070ff65a3c23b4f7ef8355.png";
 
 const CHIPS: BlogCategory[] = ["write about design", "personal musings", "life in a nutshell"];
+
+// Blog post slug in the URL, e.g. /portfolio/blog/sukoon
+// (base-aware so it matches the app's deployed path, see vite.config.ts `base`)
+const BLOG_BASE = `${import.meta.env.BASE_URL}blog/`;
+const blogUrl = (slug: string) => `${BLOG_BASE}${slug}`;
+const slugFromPath = (pathname: string) =>
+  pathname.startsWith(BLOG_BASE) ? pathname.slice(BLOG_BASE.length).replace(/\/$/, "") : null;
 
 function BlogListItem({ post, isNewest, onClick }: { post: BlogPost; isNewest: boolean; onClick: () => void }) {
   const [hov, setHov] = useState(false);
@@ -80,12 +87,54 @@ export function TinkeringSection() {
 
   const filtered = activeChip ? BLOG_POSTS.filter((p) => p.category === activeChip) : BLOG_POSTS;
 
+  // Give the drawer real page semantics: pushing a slugged URL means the browser's
+  // back button closes the drawer instead of leaving the site entirely.
+  const openPost = (post: BlogPost) => {
+    setSelectedPost(post);
+    window.history.pushState({ blogSlug: post.slug }, "", blogUrl(post.slug));
+  };
+
+  const closePost = () => {
+    if (window.history.state?.blogSlug) {
+      window.history.back();
+    } else {
+      setSelectedPost(null);
+    }
+  };
+
+  // Deep link: landing directly on the blog-post URL opens that drawer.
+  // Replace the entry first so "back" from the drawer always lands on the
+  // plain portfolio URL rather than exiting the site.
+  useEffect(() => {
+    const slug = slugFromPath(window.location.pathname);
+    const post = slug ? BLOG_POSTS.find((p) => p.slug === slug) : undefined;
+    if (post) {
+      window.history.replaceState(null, "", import.meta.env.BASE_URL);
+      window.history.pushState({ blogSlug: post.slug }, "", blogUrl(post.slug));
+      setSelectedPost(post);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Browser back/forward: sync the drawer to whatever slug (or lack of one) the
+  // history entry we've landed on carries.
+  useEffect(() => {
+    const onPopState = (e: PopStateEvent) => {
+      const slug = (e.state as { blogSlug?: string } | null)?.blogSlug;
+      const post = slug ? BLOG_POSTS.find((p) => p.slug === slug) : undefined;
+      setSelectedPost(post ?? null);
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <section>
       <BlogPostDrawer
         post={selectedPost}
-        onClose={() => setSelectedPost(null)}
-        onNavigate={(p) => setSelectedPost(p)}
+        onClose={closePost}
+        onNavigate={openPost}
       />
 
       <div style={{ padding: isMobile ? "28px 16px 60px" : "40px 40px 80px" }}>
@@ -181,7 +230,7 @@ export function TinkeringSection() {
                 key={post.id}
                 post={post}
                 isNewest={!activeChip && i === 0}
-                onClick={() => setSelectedPost(post)}
+                onClick={() => openPost(post)}
               />
             ))}
           </div>

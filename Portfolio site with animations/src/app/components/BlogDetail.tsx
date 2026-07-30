@@ -5,6 +5,7 @@ export type BlogCategory = "write about design" | "personal musings" | "life in 
 
 export interface BlogPost {
   id: number;
+  slug: string;
   date: string;
   readTime: string;
   title: string;
@@ -15,15 +16,10 @@ export interface BlogPost {
 
 const CHIPS: BlogCategory[] = ["write about design", "personal musings", "life in a nutshell"];
 
-// Posts are added as written — empty until content is submitted
 export const BLOG_POSTS: BlogPost[] = [
-  // placeholder removed — add real posts here
-  ...([] as BlogPost[]),
-];
-
-const _ARCHIVED_POSTS: BlogPost[] = [
   {
     id: 3,
+    slug: "sukoon",
     date: "Nov 2025",
     readTime: "9 min read",
     category: "life in a nutshell",
@@ -51,6 +47,7 @@ const _ARCHIVED_POSTS: BlogPost[] = [
   },
   {
     id: 4,
+    slug: "5-things-living-alone-turned-me-into",
     date: "Dec 2025",
     readTime: "6 min read",
     category: "life in a nutshell",
@@ -75,6 +72,7 @@ const _ARCHIVED_POSTS: BlogPost[] = [
   },
   {
     id: 0,
+    slug: "why-most-design-systems-fail-silently",
     date: "Mar 2024",
     readTime: "5 min read",
     category: "write about design",
@@ -90,6 +88,7 @@ const _ARCHIVED_POSTS: BlogPost[] = [
   },
   {
     id: 1,
+    slug: "the-case-for-designing-in-production",
     date: "Jan 2024",
     readTime: "4 min read",
     category: "write about design" as BlogCategory,
@@ -105,6 +104,7 @@ const _ARCHIVED_POSTS: BlogPost[] = [
   },
   {
     id: 2,
+    slug: "on-designing-for-anxiety",
     date: "Nov 2023",
     readTime: "6 min read",
     category: "personal musings" as BlogCategory,

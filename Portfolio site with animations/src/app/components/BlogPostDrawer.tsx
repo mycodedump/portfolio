@@ -80,6 +80,16 @@ export function BlogPostDrawer({ post, onClose, onNavigate }: BlogPostDrawerProp
     }
   }, [post?.id]);
 
+  // Esc closes the drawer the same way the close icon does.
+  useEffect(() => {
+    if (!post) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [post, onClose]);
+
   const related = post ? BLOG_POSTS.filter((p) => p.id !== post.id) : [];
 
   return (

@@ -23,6 +23,7 @@ import imgMulti3 from "../../imports/FullScrollableForProjects-1/5c80203c3c32b28
 // ─── Types ────────────────────────────────────────────────────────────────────
 export interface CaseStudyInfo {
   index: number;
+  slug: string;
   label: string;
   color: string;
   textColor: string;
@@ -69,6 +70,7 @@ const SECTIONS_BY_CS: Record<number, { id: string; label: string }[]> = {
 export const CASE_STUDY_DATA: CaseStudyInfo[] = [
   {
     index: 0,
+    slug: "icici-bank-onboarding",
     label: "CASE STUDY 1",
     color: "#c3be6f",
     textColor: "#625e37",
@@ -88,6 +90,7 @@ export const CASE_STUDY_DATA: CaseStudyInfo[] = [
   },
   {
     index: 1,
+    slug: "canvs-studio-design-system",
     label: "CASE STUDY 2",
     color: "#c67d39",
     textColor: "#212012",
@@ -107,6 +110,7 @@ export const CASE_STUDY_DATA: CaseStudyInfo[] = [
   },
   {
     index: 2,
+    slug: "ai-design-experiments",
     label: "CASE STUDY 3",
     color: "#dda1ae",
     textColor: "#212012",
@@ -618,6 +622,16 @@ export function CaseStudyDetail({ caseStudy, onClose, onNavigate }: Props) {
     el.addEventListener("scroll", handle, { passive: true });
     return () => el.removeEventListener("scroll", handle);
   }, [caseStudy]);
+
+  // Esc closes the drawer the same way the close icon does.
+  useEffect(() => {
+    if (!caseStudy) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [caseStudy, onClose]);
 
   useEffect(() => {
     const el = scrollableRef.current;

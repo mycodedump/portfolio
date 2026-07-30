@@ -376,13 +376,63 @@ function MobileCardList({ onSelect }: { onSelect: (cs: CaseStudyInfo) => void })
   );
 }
 
+// Case study slug in the URL, e.g. /portfolio/case-study/icici-bank-onboarding
+// (base-aware so it matches the app's deployed path, see vite.config.ts `base`)
+const CASE_STUDY_BASE = `${import.meta.env.BASE_URL}case-study/`;
+const caseStudyUrl = (slug: string) => `${CASE_STUDY_BASE}${slug}`;
+const slugFromPath = (pathname: string) =>
+  pathname.startsWith(CASE_STUDY_BASE) ? pathname.slice(CASE_STUDY_BASE.length).replace(/\/$/, "") : null;
+
 export function ProjectsSection({ onDrawerChange }: { onDrawerChange?: (open: boolean) => void }) {
   const outerRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
   const [selectedCase, setSelectedCase] = useState<CaseStudyInfo | null>(null);
 
-  const openCase = (cs: CaseStudyInfo) => { setSelectedCase(cs); onDrawerChange?.(true); };
-  const closeCase = () => { setSelectedCase(null); onDrawerChange?.(false); };
+  // Give the drawer real page semantics: pushing a slugged URL means the browser's
+  // back button closes the drawer instead of leaving the site entirely.
+  const openCase = (cs: CaseStudyInfo) => {
+    setSelectedCase(cs);
+    onDrawerChange?.(true);
+    window.history.pushState({ caseStudySlug: cs.slug }, "", caseStudyUrl(cs.slug));
+  };
+
+  const closeCase = () => {
+    if (window.history.state?.caseStudySlug) {
+      window.history.back();
+    } else {
+      setSelectedCase(null);
+      onDrawerChange?.(false);
+    }
+  };
+
+  // Deep link: landing directly on the case-study URL opens that drawer.
+  // Replace the entry first so "back" from the drawer always lands on the
+  // plain portfolio URL rather than exiting the site.
+  useEffect(() => {
+    const slug = slugFromPath(window.location.pathname);
+    const cs = slug ? CASE_STUDY_DATA.find((c) => c.slug === slug) : undefined;
+    if (cs) {
+      window.history.replaceState(null, "", import.meta.env.BASE_URL);
+      window.history.pushState({ caseStudySlug: cs.slug }, "", caseStudyUrl(cs.slug));
+      setSelectedCase(cs);
+      onDrawerChange?.(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Browser back/forward: sync the drawer to whatever slug (or lack of one) the
+  // history entry we've landed on carries.
+  useEffect(() => {
+    const onPopState = (e: PopStateEvent) => {
+      const slug = (e.state as { caseStudySlug?: string } | null)?.caseStudySlug;
+      const cs = slug ? CASE_STUDY_DATA.find((c) => c.slug === slug) : undefined;
+      setSelectedCase(cs ?? null);
+      onDrawerChange?.(!!cs);
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const scrollYProgress = useScrollProgress(outerRef, ["start start", "end end"]);
 
@@ -449,17 +499,17 @@ export function ProjectsSection({ onDrawerChange }: { onDrawerChange?: (open: bo
 
           {/* CS1 */}
           <div style={{ position: "absolute", top: DARK_H, left: 0, right: 0, zIndex: 1 }}>
-            <CardWithTab card={CARDS[0]} onClick={() => setSelectedCase(CASE_STUDY_DATA[0])} />
+            <CardWithTab card={CARDS[0]} onClick={() => openCase(CASE_STUDY_DATA[0])} />
           </div>
 
           {/* CS2 */}
           <motion.div style={{ position: "absolute", top: DARK_H, left: 0, right: 0, zIndex: 2, y: card2Y }}>
-            <CardWithTab card={CARDS[1]} onClick={() => setSelectedCase(CASE_STUDY_DATA[1])} />
+            <CardWithTab card={CARDS[1]} onClick={() => openCase(CASE_STUDY_DATA[1])} />
           </motion.div>
 
           {/* CS3 */}
           <motion.div style={{ position: "absolute", top: DARK_H, left: 0, right: 0, zIndex: 3, y: card3Y }}>
-            <CardWithTab card={CARDS[2]} onClick={() => setSelectedCase(CASE_STUDY_DATA[2])} />
+            <CardWithTab card={CARDS[2]} onClick={() => openCase(CASE_STUDY_DATA[2])} />
           </motion.div>
         </div>
       </div>

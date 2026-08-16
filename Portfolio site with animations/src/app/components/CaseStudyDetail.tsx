@@ -20,6 +20,11 @@ import imgMulti1 from "../../imports/FullScrollableForProjects-1/4257ae666e8fd23
 import imgMulti2 from "../../imports/FullScrollableForProjects-1/884412cdbee05805549dd2ba16a622921deadd5b.png";
 import imgMulti3 from "../../imports/FullScrollableForProjects-1/5c80203c3c32b2840d077bcc316d0ae47b79c6f5.png";
 
+// ─── CS2 image assets (ICICI FASTag) ──────────────────────────────────────────
+import imgFastagNonIcici from "../../assets/FASTag/1.png";
+import imgFastagAutoOff from "../../assets/FASTag/2.png";
+import imgFastagAutoOn from "../../assets/FASTag/3.png";
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 export interface CaseStudyInfo {
   index: number;
@@ -53,9 +58,11 @@ const SECTIONS_BY_CS: Record<number, { id: string; label: string }[]> = {
     { id: "cs-media", label: "Walkthrough" },
   ],
   1: [
-    { id: "cs-problem", label: "Problem statement" },
-    { id: "cs-solution", label: "Solution approach" },
-    { id: "cs-outcome", label: "Outcome" },
+    { id: "cs-intro", label: "Introduction" },
+    { id: "cs-landing", label: "Landing page" },
+    { id: "cs-card", label: "FASTag card exploration" },
+    { id: "cs-details", label: "All FASTag details" },
+    { id: "cs-recharge", label: "FASTag recharge" },
     { id: "cs-media", label: "Walkthrough" },
   ],
   2: [
@@ -90,13 +97,13 @@ export const CASE_STUDY_DATA: CaseStudyInfo[] = [
   },
   {
     index: 1,
-    slug: "canvs-studio-design-system",
+    slug: "icici-fastag-platform",
     label: "CASE STUDY 2",
     color: "#c67d39",
     textColor: "#212012",
     imageBg: "#d19761",
     dotColor: "#C67D39",
-    title: "Building a scalable design system at Canvs Studio",
+    title: "Bringing India's most-used toll payment system to ICICI's web platform — for the first time.",
     type: "UX + UI",
     role: "Sole designer",
     status: "Ongoing",
@@ -129,6 +136,21 @@ export const CASE_STUDY_DATA: CaseStudyInfo[] = [
     overview: "Explored how generative AI can augment design without stripping creative ownership — 3× faster first prototypes.",
   },
 ];
+
+// ─── Shared spacing system ─────────────────────────────────────────────────────
+// .cs-sections  → wraps top-level SectionBlocks: 40px between main sections
+// .cs-flow      → wraps a section's content: 16px default rhythm between paragraphs,
+//                 24px before a title-2/title-3, 12px after a title-2/title-3,
+//                 20px between two consecutive image containers (.cs-img)
+// .cs-bullets   → wraps a bullet <ul>: 8px between bullet points
+const CS_SPACING_CSS = `
+  .cs-sections > * + * { margin-top: 40px; }
+  .cs-flow > * + * { margin-top: 16px; }
+  .cs-flow > * + .cs-t2, .cs-flow > * + .cs-t3 { margin-top: 24px; }
+  .cs-flow > .cs-t2 + *, .cs-flow > .cs-t3 + * { margin-top: 12px; }
+  .cs-flow > .cs-img + .cs-img { margin-top: 20px; }
+  .cs-bullets > li + li { margin-top: 8px; }
+`;
 
 // ─── Shared: card thumbnail placeholder ──────────────────────────────────────
 export function ThumbnailPlaceholder({
@@ -229,7 +251,7 @@ function SectionHeading({ children, mobile = false }: { children: React.ReactNod
 
 function BodyText({ children, color = "#444", mobile = false }: { children: React.ReactNode; color?: string; mobile?: boolean }) {
   return (
-    <p className="font-jakarta font-medium" style={{
+    <p className="font-jakarta font-normal" style={{
       fontSize: mobile ? 12 : 14,
       lineHeight: mobile ? "18px" : "20px",
       color,
@@ -255,6 +277,139 @@ function OrangeBlockquote({ children, mobile = false }: { children: React.ReactN
   );
 }
 
+function SubHeading({ children, mobile = false }: { children: React.ReactNode; mobile?: boolean }) {
+  return (
+    <p className="font-jakarta font-semibold cs-t2" style={{
+      fontSize: mobile ? 12 : 16,
+      lineHeight: mobile ? "18px" : "20px",
+      color: "#444",
+      letterSpacing: mobile ? "0.12px" : "0.16px",
+    }}>
+      {children}
+    </p>
+  );
+}
+
+// Carousel — one Figma-exact "Frame 1597884708" card (584×645 @ desktop) shown fully,
+// the rest of the slides reduced to 60×40px (scaled down on mobile) clickable thumbnails.
+interface CarouselSlide {
+  src?: string;
+  caption: string;
+}
+
+function ImageCarousel({ slides, mobile = false, bgColor = "#e7ded5" }: { slides: CarouselSlide[]; mobile?: boolean; bgColor?: string }) {
+  const [active, setActive] = useState(0);
+  const current = slides[active];
+  const strokeColor = "#c67d39";
+  const thumbW = mobile ? 48 : 60;
+  const thumbH = mobile ? 32 : 40;
+
+  return (
+    <div className="cs-img" style={{ display: "flex", flexDirection: "column", gap: mobile ? 10 : 12 }}>
+      {/* Full frame — the one active slide */}
+      <div
+        style={{
+          display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center",
+          padding: mobile ? "16px 16px 14px" : "24px 24px 20px",
+          gap: 10,
+          width: "100%",
+          aspectRatio: "584 / 645",
+          backgroundColor: bgColor,
+          borderRadius: 8,
+        }}
+      >
+        <div style={{
+          display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center",
+          gap: mobile ? 12 : 16,
+          width: "96.64%",
+        }}>
+          {/* Image + its outside stroke ring: overflow-hidden box clips the 5px-rounded image,
+              a separate inset:-1 sibling draws the 1px white stroke just outside that edge —
+              a plain `border` here would sit inside the box and dent the rounded corners. */}
+          <div style={{ position: "relative", width: "100%", aspectRatio: "518 / 572", flexShrink: 0 }}>
+            <div style={{ width: "100%", height: "100%", borderRadius: 5, overflow: "hidden", backgroundColor: bgColor }}>
+              {current.src ? (
+                <img src={current.src} alt={current.caption} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+              ) : (
+                <ThumbnailPlaceholder bgColor={bgColor} strokeColor={strokeColor} height="100%" iconSize={32} />
+              )}
+            </div>
+            <div style={{ position: "absolute", inset: -1, border: "1px solid #ffffff", borderRadius: 6, pointerEvents: "none" }} />
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "row", alignItems: "center", padding: "0 4px", gap: 6, width: "100%", flexShrink: 0 }}>
+            <div style={{ width: 3, height: 13, borderRadius: 4, backgroundColor: strokeColor, flexShrink: 0 }} />
+            <p className="font-jakarta font-medium" style={{
+              flex: 1, minWidth: 0,
+              fontSize: 10, lineHeight: "13px", letterSpacing: "0.01em",
+              color: "rgba(33,32,18,0.5)",
+              whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+            }}>
+              {current.caption}
+            </p>
+            <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 4, flexShrink: 0 }}>
+              <p className="font-jakarta font-medium" style={{ fontSize: 10, lineHeight: "13px", letterSpacing: "0.01em", color: "#735933" }}>
+                {active + 1}
+              </p>
+              <div style={{ width: 3, height: 3, borderRadius: "50%", backgroundColor: "rgba(115,89,51,0.3)" }} />
+              <p className="font-jakarta font-medium" style={{ fontSize: 10, lineHeight: "13px", letterSpacing: "0.01em", color: "rgba(115,89,51,0.5)" }}>
+                {slides.length}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Thumbnails — always all N slides (N = the counter's total), active one highlighted.
+          Never conditionally removed, so the row never reorders and every slide stays reachable. */}
+      {slides.length > 1 && (
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+          {slides.map((slide, i) => (
+            <button
+              key={i}
+              onClick={() => setActive(i)}
+              aria-label={slide.caption}
+              aria-current={i === active}
+              style={{
+                position: "relative", display: "block", flexShrink: 0,
+                width: thumbW, height: thumbH,
+                padding: 0, border: "none", background: "none", cursor: "pointer",
+                borderRadius: 4, overflow: "hidden",
+                opacity: i === active ? 1 : 0.55,
+                transition: "opacity 0.15s ease",
+              }}
+            >
+              {slide.src ? (
+                <img src={slide.src} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+              ) : (
+                <ThumbnailPlaceholder bgColor={bgColor} strokeColor={strokeColor} height="100%" iconSize={12} />
+              )}
+              <div style={{
+                position: "absolute", inset: -1, borderRadius: 5, pointerEvents: "none",
+                border: i === active ? `1.5px solid ${strokeColor}` : "1px solid #ffffff",
+              }} />
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function IterationLabel({ children, mobile = false }: { children: React.ReactNode; mobile?: boolean }) {
+  return (
+    <p className="font-jakarta font-semibold cs-t3" style={{
+      fontSize: mobile ? 12 : 14,
+      lineHeight: mobile ? "17px" : "20px",
+      letterSpacing: "0.02em",
+      textTransform: "uppercase",
+      color: "#c67d39",
+    }}>
+      {children}
+    </p>
+  );
+}
+
 function HMWBullet({ num, text, mobile = false }: { num: number; text: string; mobile?: boolean }) {
   return (
     <div style={{ backgroundColor: "rgba(198,125,57,0.1)", borderRadius: 8, border: "1px solid rgba(198,125,57,0.3)", overflow: "hidden", display: "flex", alignItems: "center" }}>
@@ -263,7 +418,7 @@ function HMWBullet({ num, text, mobile = false }: { num: number; text: string; m
         <div style={{ width: 20, height: 20, borderRadius: 16, backgroundColor: "#c67d39", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
           <p className="font-jakarta font-bold text-white" style={{ fontSize: 12, lineHeight: "16px", letterSpacing: "0.12px" }}>{num}</p>
         </div>
-        <p className="font-jakarta font-medium" style={{
+        <p className="font-jakarta font-normal" style={{
           fontSize: mobile ? 12 : 13,
           lineHeight: mobile ? "18px" : "16px",
           color: "#444", letterSpacing: mobile ? "0.12px" : "0.13px",
@@ -295,7 +450,7 @@ function PhoneStrip({
       { left: undefined, right: 16 },
     ];
     return (
-      <div style={{
+      <div className="cs-img" style={{
         backgroundColor: bgColor, borderRadius: 8, overflow: "hidden",
         position: "relative", height: 272, width: "100%", flexShrink: 0,
       }}>
@@ -348,7 +503,7 @@ function PhoneStrip({
 
   // Desktop layout
   return (
-    <div style={{ backgroundColor: bgColor, borderRadius: 8, overflow: "hidden", position: "relative", height, width: "100%", flexShrink: 0 }}>
+    <div className="cs-img" style={{ backgroundColor: bgColor, borderRadius: 8, overflow: "hidden", position: "relative", height, width: "100%", flexShrink: 0 }}>
       {images.map((img, i) => (
         <div key={i} style={{ position: "absolute", top: img.top ?? 24, left: img.left, right: img.right, width: img.width ?? 150, height: img.height ?? 333, borderRadius: 5, overflow: "hidden", pointerEvents: "none" }}>
           <img src={img.src} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 5 }} />
@@ -430,11 +585,11 @@ function RelatedCard({ cs, onClick }: { cs: CaseStudyInfo; onClick: () => void }
 function CS1Content({ isMobile }: { isMobile: boolean }) {
   const m = isMobile;
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: m ? 28 : 40 }}>
+    <div className="cs-sections" style={{ display: "flex", flexDirection: "column" }}>
       <SectionBlock id="cs-problem">
-        <div style={{ display: "flex", flexDirection: "column", gap: m ? 12 : 16 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <SectionHeading mobile={m}>THE PROBLEM</SectionHeading>
-          <div style={{ display: "flex", flexDirection: "column", gap: m ? 8 : 12 }}>
+          <div className="cs-flow" style={{ display: "flex", flexDirection: "column" }}>
             <BodyText mobile={m}>
               ICICI Bank credit cards were declining 30% of international transactions. Not because the cards didn't work abroad (ICICI Bank cards have global acceptance across Visa and Mastercard) but because of a structural reason: by RBI mandate, every new or reissued card ships with international usage switched off by default.
             </BodyText>
@@ -451,12 +606,12 @@ function CS1Content({ isMobile }: { isMobile: boolean }) {
       </SectionBlock>
 
       <SectionBlock id="cs-hmw">
-        <div style={{ display: "flex", flexDirection: "column", gap: m ? 12 : 16 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <OrangeBlockquote mobile={m}>
             We're facing a 30% decline rate on international transactions. We're building{" "}
             <em>iTravel</em>, a unified hub where customers declare their travel plans and the bank automatically aligns card usage and fraud monitoring to that profile.
           </OrangeBlockquote>
-          <div style={{ display: "flex", flexDirection: "column", gap: m ? 8 : 12 }}>
+          <div className="cs-flow" style={{ display: "flex", flexDirection: "column" }}>
             <BodyText mobile={m}>My job was to take that mandate and three open-ended HMWs, and turn them into a complete, shippable product experience.</BodyText>
             <HMWBullet mobile={m} num={1} text="HMW — make international card usage easy to turn on only when needed, so customers feel confident and in control while travelling." />
             <HMWBullet mobile={m} num={2} text="HMW — ensure genuine international transactions get approved, so customers have a seamless payment experience and prefer their ICICI card." />
@@ -466,9 +621,9 @@ function CS1Content({ isMobile }: { isMobile: boolean }) {
       </SectionBlock>
 
       <SectionBlock id="cs-toggle">
-        <div style={{ display: "flex", flexDirection: "column", gap: m ? 12 : 16 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <SectionHeading mobile={m}>Why this isn't just a toggle problem</SectionHeading>
-          <div style={{ display: "flex", flexDirection: "column", gap: m ? 8 : 12 }}>
+          <div className="cs-flow" style={{ display: "flex", flexDirection: "column" }}>
             <BodyText mobile={m}>{`It's tempting to read "30% decline" and reach for the obvious fix: surface the toggle more prominently. That fix would help, but it doesn't touch the harder layer: RBI's framework requires separate switches for International Cash, POS, ATM, and E-commerce.`}</BodyText>
             <PhoneStrip
               mobile={m}
@@ -483,14 +638,14 @@ function CS1Content({ isMobile }: { isMobile: boolean }) {
       </SectionBlock>
 
       <SectionBlock id="cs-flow">
-        <div style={{ display: "flex", flexDirection: "column", gap: m ? 12 : 16 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <SectionHeading mobile={m}>Getting users into the flow, before they ever need it</SectionHeading>
-          <div style={{ display: "flex", flexDirection: "column", gap: m ? 8 : 12 }}>
+          <div className="cs-flow" style={{ display: "flex", flexDirection: "column" }}>
             <BodyText mobile={m}>Most ICICI cardholders barely open the iMobile app — bill payments happen through third-party apps like CRED, PhonePe, GPay. If iTravel only lived inside the app, it would only reach people already looking for it.</BodyText>
-            <div style={{ borderRadius: 8, overflow: "hidden" }}>
+            <div className="cs-img" style={{ borderRadius: 8, overflow: "hidden" }}>
               <img src={imgFlowChart} alt="Multi-channel entry points" style={{ width: "100%", height: m ? "auto" : 389, objectFit: "cover", borderRadius: 8, display: "block" }} />
             </div>
-            <p className="font-jakarta font-semibold" style={{ fontSize: m ? 13 : 16, lineHeight: m ? "18px" : "20px", color: "#444", letterSpacing: m ? "0.13px" : "0.16px" }}>Force modals for different user types</p>
+            <SubHeading mobile={m}>Force modals for different user types</SubHeading>
             <PhoneStrip
               mobile={m}
               images={[{ src: imgModal1, left: 24 }, { src: imgModal2, left: 240 }, { src: imgModal3, left: 410 }]}
@@ -504,12 +659,12 @@ function CS1Content({ isMobile }: { isMobile: boolean }) {
       </SectionBlock>
 
       <SectionBlock id="cs-trip">
-        <div style={{ display: "flex", flexDirection: "column", gap: m ? 12 : 16 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <SectionHeading mobile={m}>Declaring the trip — the part that does the real work</SectionHeading>
-          <div style={{ display: "flex", flexDirection: "column", gap: m ? 8 : 12 }}>
-            <p className="font-jakarta font-semibold" style={{ fontSize: m ? 12 : 16, lineHeight: m ? "18px" : "20px", color: "#444", letterSpacing: m ? "0.12px" : "0.16px" }}>Once inside the flow, the user declares:</p>
-            <ul className="font-jakarta font-medium" style={{ fontSize: m ? 12 : 14, lineHeight: m ? "18px" : "20px", color: "#444", letterSpacing: m ? "0.12px" : "0.14px", paddingLeft: 18 }}>
-              <li style={{ marginBottom: 6 }}><strong>Destination(s)</strong> — single or multi-country, with layover and transit stops</li>
+          <div className="cs-flow" style={{ display: "flex", flexDirection: "column" }}>
+            <SubHeading mobile={m}>Once inside the flow, the user declares:</SubHeading>
+            <ul className="font-jakarta font-normal cs-bullets" style={{ fontSize: m ? 12 : 14, lineHeight: m ? "18px" : "20px", color: "#444", letterSpacing: m ? "0.12px" : "0.14px", paddingLeft: 18 }}>
+              <li><strong>Destination(s)</strong> — single or multi-country, with layover and transit stops</li>
               <li><strong>Travel dates</strong> — start/end, with per-leg duration for multi-country trips</li>
             </ul>
             <PhoneStrip
@@ -534,26 +689,254 @@ function CS1Content({ isMobile }: { isMobile: boolean }) {
   );
 }
 
-// ─── Placeholder content for CS2 / CS3 ───────────────────────────────────────
+// ─── CS2 content (ICICI FASTag) ───────────────────────────────────────────────
+function CS2Content({ isMobile }: { isMobile: boolean }) {
+  const m = isMobile;
+  return (
+    <div className="cs-sections" style={{ display: "flex", flexDirection: "column" }}>
+      <SectionBlock id="cs-intro">
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <SectionHeading mobile={m}>INTRODUCTION</SectionHeading>
+          <div className="cs-flow" style={{ display: "flex", flexDirection: "column" }}>
+            <BodyText mobile={m}>
+              FASTag is mandatory for all four-wheelers on Indian highways, and ICICI Bank commands nearly 29% of the national FASTag market. Before this project, every one of those customers relied solely on iMobile or a third-party app to manage their tag.
+            </BodyText>
+            <BodyText mobile={m}>
+              I designed the entire FASTag experience for RIB from scratch. No brief. No precedent. Just iMobile's existing flows as reference, a fixed two-week deadline, and three distinct user types that needed to coexist on the same platform.
+            </BodyText>
+
+            <SectionHeading mobile={m}>It's 11pm on the highway, and the toll is ahead</SectionHeading>
+
+            <BodyText mobile={m}>
+              Think about Job 1 for a second — someone's checking their FASTag balance while driving toward a toll plaza. They're not relaxed, they're not browsing. They need an answer in a glance. Urgent, quick, no room for hunting.
+            </BodyText>
+            <SubHeading mobile={m}>
+              That's exactly why the card works the way it does:
+            </SubHeading>
+            <ul className="font-jakarta font-normal cs-bullets" style={{ fontSize: m ? 12 : 14, lineHeight: m ? "18px" : "20px", color: "#444", letterSpacing: m ? "0.12px" : "0.14px", paddingLeft: 18 }}>
+              <li><strong>Vehicle number and model</strong> — you can scan it in under two seconds, no reading needed</li>
+              <li><strong>Balance</strong> — it's the biggest thing on the card, impossible to miss</li>
+              <li><strong>Recharge</strong> — one tap, always there, always in the same spot no matter the card state</li>
+              <li><strong>Everything else</strong> — tucked behind the three-dot menu or the detail page, out of the way until you actually need it</li>
+            </ul>
+            <BodyText mobile={m}>
+              The secondary stuff (tag replacement, KYC, close tag, raise a query) — sure, it matters. But it's not why someone opens FASTag at 11pm on the highway. Keeping it secondary isn't a compromise. That's the whole point.
+            </BodyText>
+          </div>
+        </div>
+      </SectionBlock>
+
+      <SectionBlock id="cs-landing">
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <SectionHeading mobile={m}>Landing page</SectionHeading>
+          <div className="cs-flow" style={{ display: "flex", flexDirection: "column" }}>
+            <BodyText mobile={m}>
+              One landing page. Three user types. Multiple card states. Everything had to be readable at a glance — including for fleet owners managing 20+ FASTags simultaneously.
+            </BodyText>
+            <SubHeading mobile={m}>
+              There are 3 user types:
+            </SubHeading>
+            <ul className="font-jakarta font-normal cs-bullets" style={{ fontSize: m ? 12 : 14, lineHeight: m ? "18px" : "20px", color: "#444", letterSpacing: m ? "0.12px" : "0.14px", paddingLeft: 18 }}>
+              <li>New user</li>
+              <li>Existing users (ICICI Bank and non-ICICI Bank)</li>
+              <li>Fleet owners (ICICI Bank and non-ICICI Bank)</li>
+            </ul>
+
+            <SectionHeading mobile={m}>The TAB decision</SectionHeading>
+            <BodyText mobile={m}>
+              Early versions showed all FASTags in one mixed list — ICICI and non-ICICI together, sorted by recency. The problem: a just-linked third-party FASTag would float to the top, pushing the user's ICICI card down the scroll. Wrong for the user. Wrong for the bank.
+            </BodyText>
+            <BodyText mobile={m}>
+              Splitting into two tabs — My FASTag and Other bank FASTag — solved both at once. ICICI cards always surface first. The tab structure tells the user what service level to expect before they open a single card.
+            </BodyText>
+
+            <div className="cs-img" style={{ height: m ? 200 : 264, backgroundColor: "#d19761", borderRadius: 8, overflow: "hidden" }}>
+              <ThumbnailPlaceholder bgColor="#d19761" strokeColor="#212012" height={m ? 200 : 264} iconSize={32} />
+            </div>
+          </div>
+        </div>
+      </SectionBlock>
+
+      <SectionBlock id="cs-card">
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <SectionHeading mobile={m}>FASTag card exploration</SectionHeading>
+          <div className="cs-flow" style={{ display: "flex", flexDirection: "column" }}>
+            <SubHeading mobile={m}>
+              The problem
+            </SubHeading>
+            <BodyText mobile={m}>
+              The card had to do five jobs: identify the vehicle, show balance, trigger recharge, flag errors, and indicate auto-recharge status. New edge cases kept arriving after the first drop — RC rejected, KYV pending, low balance, inactive — and each new state changed the layout.
+            </BodyText>
+            <BodyText mobile={m}>
+              I went through multiple rounds before the card resolved.
+            </BodyText>
+
+            <IterationLabel mobile={m}>Iteration 1 — Started simple</IterationLabel>
+            <div className="cs-img" style={{ height: m ? 200 : 264, backgroundColor: "#d19761", borderRadius: 8, overflow: "hidden" }}>
+              <ThumbnailPlaceholder bgColor="#d19761" strokeColor="#212012" height={m ? 200 : 264} iconSize={32} />
+            </div>
+            <BodyText mobile={m}>
+              This card was the gateway to everything — all details, services, history. Get it wrong and the whole page falls apart. The first drop focused on the essentials: vehicle number, model, balance, recharge, overflow menu. The client liked it, then added to it. Urgency signals, auto-recharge status, and other bank FASTag callouts all needed to live here too.
+            </BodyText>
+
+            <IterationLabel mobile={m}>Iteration 2 — Absorbed the feedback</IterationLabel>
+            <div className="cs-img" style={{ height: m ? 200 : 264, backgroundColor: "#d19761", borderRadius: 8, overflow: "hidden" }}>
+              <ThumbnailPlaceholder bgColor="#d19761" strokeColor="#212012" height={m ? 200 : 264} iconSize={32} />
+            </div>
+            <BodyText mobile={m}>
+              It held for simple cases. Then an edge case surfaced: what if a user has low balance and a rejected RC simultaneously? Two unrelated error states, both needing attention, both fighting for the same space. They couldn't be merged — they were different problems requiring different actions. The card broke under the combination.
+            </BodyText>
+
+            <IterationLabel mobile={m}>Iteration 3 — Give errors room</IterationLabel>
+            <BodyText mobile={m}>
+              The fix was giving urgency signals their own space rather than forcing them into the card body. A few more variants, shown to the client, and this was approved, yayy!
+            </BodyText>
+            <div className="cs-img" style={{ height: m ? 200 : 264, backgroundColor: "#d19761", borderRadius: 8, overflow: "hidden" }}>
+              <ThumbnailPlaceholder bgColor="#d19761" strokeColor="#212012" height={m ? 200 : 264} iconSize={32} />
+            </div>
+            <BodyText mobile={m}>
+              The anchor across all states: vehicle number, balance, recharge — always visible, always in the same position.
+            </BodyText>
+          </div>
+        </div>
+      </SectionBlock>
+
+      <SectionBlock id="cs-details">
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <SectionHeading mobile={m}>All FASTag details</SectionHeading>
+          <div className="cs-flow" style={{ display: "flex", flexDirection: "column" }}>
+            <SubHeading mobile={m}>Three card types, one layout</SubHeading>
+            <BodyText mobile={m}>
+              The detail page is structurally identical across all three FASTag types. What changes is the right column — the service set available to that specific tag.
+            </BodyText>
+            <BodyText mobile={m}>
+              For an ICICI FASTag this is the full service suite: Recharge, Auto recharge, Tag replacement, Update RC, Know Your Vehicle, Close FASTag, Raise a query, View tag details.
+            </BodyText>
+            <BodyText mobile={m}>
+              For a non-ICICI FASTag the right column reduces to three options: Recharge, Remove, and Buy ICICI FASTag.
+            </BodyText>
+            <ImageCarousel
+              mobile={m}
+              slides={[
+                { src: imgFastagNonIcici, caption: "Non-ICICI Bank FASTag" },
+                { src: imgFastagAutoOff, caption: "ICICI Bank FASTag — Auto-recharge off" },
+                { src: imgFastagAutoOn, caption: "ICICI Bank FASTag — Auto-recharge on" },
+              ]}
+            />
+
+            <SubHeading mobile={m}>All states</SubHeading>
+            <BodyText mobile={m}>
+              There have been various states and micro-interactions added to multiple sections of the landing. Scroll to view all the interactions.
+            </BodyText>
+            <ImageCarousel
+              mobile={m}
+              slides={[
+                { caption: "Placeholder — state 1" },
+                { caption: "Placeholder — state 2" },
+                { caption: "Placeholder — state 3" },
+              ]}
+            />
+
+            <SubHeading mobile={m}>Filter and email FASTag history</SubHeading>
+            <BodyText mobile={m}>
+              <strong>Filter history</strong> — Chips were added for easily filtering of the history. For customized dates, the user can filter by start and end date.
+            </BodyText>
+            <ImageCarousel
+              mobile={m}
+              slides={[
+                { caption: "Placeholder — filter chips" },
+                { caption: "Placeholder — custom date range" },
+              ]}
+            />
+            <BodyText mobile={m}>
+              <strong>Email statement</strong> — After the 1st drop, there was an additional requirement from the client that the user can only fetch the history for up to 90 days on the interface, and payments older than that would be emailed to their registered email ID.
+            </BodyText>
+            <ImageCarousel
+              mobile={m}
+              slides={[
+                { caption: "Placeholder — email statement" },
+              ]}
+            />
+          </div>
+        </div>
+      </SectionBlock>
+
+      <SectionBlock id="cs-recharge">
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <SectionHeading mobile={m}>FASTag recharge</SectionHeading>
+          <div className="cs-flow" style={{ display: "flex", flexDirection: "column" }}>
+            <SubHeading mobile={m}>The problem with the first version</SubHeading>
+            <BodyText mobile={m}>
+              The mobile reference flows had three separate recharge experiences depending on where the user came from — ICICI FASTag, linked non-ICICI, and first-time non-linked. Some were modals, some full-page, each with different data points. The same action looked different every time and the client pushed for an experience of keeping them as is. It was unsustainable to maintain, and expensive to build.
+            </BodyText>
+            <div className="cs-img" style={{ height: m ? 200 : 264, backgroundColor: "#d19761", borderRadius: 8, overflow: "hidden" }}>
+              <ThumbnailPlaceholder bgColor="#d19761" strokeColor="#212012" height={m ? 200 : 264} iconSize={32} />
+            </div>
+
+            <IterationLabel mobile={m}>The fix</IterationLabel>
+            <BodyText mobile={m}>
+              One standard recharge flow. Regardless of entry point — dashboard card, detail page, quick action panel — the user lands on the same experience with the same data points.
+            </BodyText>
+            <SubHeading mobile={m}>
+              The vehicle type determines what's shown within that standard flow:
+            </SubHeading>
+            <ul className="font-jakarta font-normal cs-bullets" style={{ fontSize: m ? 12 : 14, lineHeight: m ? "18px" : "20px", color: "#444", letterSpacing: m ? "0.12px" : "0.14px", paddingLeft: 18 }}>
+              <li><strong>For a linked vehicle</strong> — registration number pre-filled, balance visible, straight to amount.</li>
+              <li><strong>For a non-linked vehicle (first time)</strong> — registration number entry required, then the same flow.</li>
+            </ul>
+            <BodyText mobile={m}>
+              The entry point context is resolved before the user enters the flow. Inside the flow, it is always the same.
+            </BodyText>
+            <ImageCarousel
+              mobile={m}
+              slides={[
+                { caption: "Placeholder — linked vehicle" },
+                { caption: "Placeholder — non-linked vehicle" },
+              ]}
+            />
+          </div>
+        </div>
+      </SectionBlock>
+
+      <SectionBlock id="cs-reflection">
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <SectionHeading mobile={m}>Currently <em>in-development</em>, but what I took away...</SectionHeading>
+          <div className="cs-flow" style={{ display: "flex", flexDirection: "column" }}>
+            <BodyText mobile={m}>
+              The requirements were half-baked and the timeline was too short for the volume. The biggest thing I learned: negotiate on scope or timeline upfront, not after you're already deep in it.
+            </BodyText>
+            <BodyText mobile={m}>
+              Working solo on something this large taught me what I'm actually capable of under pressure. Every interaction, every click path — I was the only one deciding. That's a different kind of responsibility than working in a team, and I didn't fully appreciate it until I was in it.
+            </BodyText>
+            <BodyText mobile={m}>
+              Redesigning an entire flow midway, defending the decision to stakeholders, and still handing off on time gave me a confidence I didn't have going in. This project showed me I can hold complexity and ship.
+            </BodyText>
+          </div>
+        </div>
+      </SectionBlock>
+    </div>
+  );
+}
+
+// ─── Placeholder content for CS3 ──────────────────────────────────────────────
 function PlaceholderContent({ cs, isMobile }: { cs: CaseStudyInfo; isMobile: boolean }) {
   const m = isMobile;
-  const s2ids = ["cs-problem", "cs-solution", "cs-outcome"];
   const s3ids = ["cs-problem", "cs-process", "cs-findings"];
-  const ids = cs.index === 1 ? s2ids : s3ids;
-  const labels = cs.index === 1
-    ? ["Problem Statement", "Solution Approach", "Outcome"]
-    : ["Problem Statement", "Process", "Key Findings"];
+  const ids = s3ids;
+  const labels = ["Problem Statement", "Process", "Key Findings"];
   const placeholders = [{ h: 264, bg: "#ffffff" }, { h: 200, bg: cs.imageBg }, { h: 200, bg: cs.imageBg }];
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: m ? 28 : 40 }}>
+    <div className="cs-sections" style={{ display: "flex", flexDirection: "column" }}>
       {ids.map((id, i) => (
         <SectionBlock key={id} id={id}>
-          <div style={{ display: "flex", flexDirection: "column", gap: m ? 12 : 16 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             <SectionHeading mobile={m}>{labels[i]}</SectionHeading>
-            <BodyText mobile={m}>{cs.overview}</BodyText>
-            <div style={{ height: placeholders[i].h, backgroundColor: placeholders[i].bg, borderRadius: 8, overflow: "hidden" }}>
-              <ThumbnailPlaceholder bgColor={placeholders[i].bg === "#ffffff" ? cs.imageBg : placeholders[i].bg} strokeColor={cs.textColor} height={placeholders[i].h} iconSize={32} />
+            <div className="cs-flow" style={{ display: "flex", flexDirection: "column" }}>
+              <BodyText mobile={m}>{cs.overview}</BodyText>
+              <div className="cs-img" style={{ height: placeholders[i].h, backgroundColor: placeholders[i].bg, borderRadius: 8, overflow: "hidden" }}>
+                <ThumbnailPlaceholder bgColor={placeholders[i].bg === "#ffffff" ? cs.imageBg : placeholders[i].bg} strokeColor={cs.textColor} height={placeholders[i].h} iconSize={32} />
+              </div>
             </div>
           </div>
         </SectionBlock>
@@ -567,7 +950,7 @@ function LeftPanelAudio({ color }: { color: string }) {
   const [playing, setPlaying] = useState(false);
   return (
     <div style={{ paddingTop: 4 }}>
-      <p className="font-jakarta font-medium" style={{ fontSize: 11, letterSpacing: "0.5px", color: "rgba(33,32,18,0.4)", textTransform: "uppercase", marginBottom: 8 }}>
+      <p className="font-jakarta font-normal" style={{ fontSize: 11, letterSpacing: "0.5px", color: "rgba(33,32,18,0.4)", textTransform: "uppercase", marginBottom: 8 }}>
         listen
       </p>
       <button
@@ -706,6 +1089,7 @@ export function CaseStudyDetail({ caseStudy, onClose, onNavigate }: Props) {
 
             {/* Scrollable inner */}
             <div ref={scrollableRef} style={{ height: "100%", overflowY: "auto", scrollbarWidth: "none" }}>
+              <style>{CS_SPACING_CSS}</style>
 
               {/* ── MOBILE LAYOUT ── */}
               {isMobile ? (
@@ -764,6 +1148,8 @@ export function CaseStudyDetail({ caseStudy, onClose, onNavigate }: Props) {
                     <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
                       {caseStudy.index === 0
                         ? <CS1Content isMobile={true} />
+                        : caseStudy.index === 1
+                        ? <CS2Content isMobile={true} />
                         : <PlaceholderContent cs={caseStudy} isMobile={true} />
                       }
                     </div>
@@ -852,7 +1238,7 @@ export function CaseStudyDetail({ caseStudy, onClose, onNavigate }: Props) {
                       </div>
 
                       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                        <p className="font-jakarta font-medium" style={{ fontSize: 11, letterSpacing: "0.5px", color: "rgba(33,32,18,0.4)", textTransform: "uppercase", marginBottom: 4 }}>
+                        <p className="font-jakarta font-normal" style={{ fontSize: 11, letterSpacing: "0.5px", color: "rgba(33,32,18,0.4)", textTransform: "uppercase", marginBottom: 4 }}>
                           index
                         </p>
                         {sections.map((s) => (
@@ -867,7 +1253,7 @@ export function CaseStudyDetail({ caseStudy, onClose, onNavigate }: Props) {
                               style={{ height: 14, backgroundColor: caseStudy.color, borderRadius: 2, flexShrink: 0, overflow: "hidden" }}
                             />
                             <p
-                              className="font-jakarta font-medium"
+                              className="font-jakarta font-normal"
                               style={{ fontSize: 12, letterSpacing: "0.12px", color: activeSection === s.id ? "#212012" : "rgba(33,32,18,0.4)", transition: "color 0.2s ease" }}
                             >
                               {s.label}
@@ -890,6 +1276,8 @@ export function CaseStudyDetail({ caseStudy, onClose, onNavigate }: Props) {
 
                       {caseStudy.index === 0
                         ? <CS1Content isMobile={false} />
+                        : caseStudy.index === 1
+                        ? <CS2Content isMobile={false} />
                         : <PlaceholderContent cs={caseStudy} isMobile={false} />
                       }
 

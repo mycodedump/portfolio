@@ -224,7 +224,7 @@ function PostBody({ post }: { post: BlogPost }) {
         }}
       />
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
         {post.body.map((para, i) => (
           <motion.p
             key={i}

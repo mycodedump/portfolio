@@ -119,11 +119,11 @@ export const CASE_STUDY_DATA: CaseStudyInfo[] = [
     role: "Sole designer",
     status: "Ongoing",
     year: "2022–2023",
-    client: "Canvs Studio",
+    client: "Indian Bank",
     designTeam: "Laxmi Mahajan (Designer), Harleen Chatha (Design Manager)",
-    crossTeam: "Engineering leads across 4 client projects",
-    timeline: "3 months",
-    statusFull: "V1 shipped and adopted across all new client engagements",
+    crossTeam: "Product Manager, Design Manager, Product Designer",
+    timeline: "2 weeks",
+    statusFull: "Under development",
     overview: "Created a token-based design system from scratch, reducing handoff time by 60% across 20+ clients.",
   },
   {
@@ -748,11 +748,8 @@ function CS1Content({ isMobile }: { isMobile: boolean }) {
           <SectionHeading mobile={m}>Getting users into the flow, before they ever need it</SectionHeading>
           <div className="cs-flow" style={{ display: "flex", flexDirection: "column" }}>
             <BodyText mobile={m}>Most ICICI cardholders barely open the iMobile app — bill payments happen through third-party apps like CRED, PhonePe, GPay. If iTravel only lived inside the app, it would only reach people already looking for it.</BodyText>
-            <div className="cs-img" style={{ position: "relative", width: "100%" }}>
-              <div style={{ borderRadius: 5, overflow: "hidden" }}>
-                <img src={imgFlowChart} alt="Multi-channel entry points" style={{ width: "100%", height: m ? "auto" : 389, objectFit: "cover", display: "block" }} />
-              </div>
-              <div style={{ position: "absolute", inset: -1, border: "1px solid #ffffff", borderRadius: 6, pointerEvents: "none" }} />
+            <div className="cs-img">
+              <StrokedImage src={imgFlowChart} alt="Multi-channel entry points" aspectRatio="4032 / 2582" />
             </div>
             <SubHeading mobile={m}>Force modals for different user types</SubHeading>
             <PhoneStrip

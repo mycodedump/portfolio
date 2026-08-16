@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Redirecting…</title>
+    <script>
+      // GitHub Pages has no server to rewrite a deep link (e.g. /portfolio/case-study/some-slug)
+      // back to index.html, so it 404s before the app's client-side router ever runs. This
+      // redirects to the real app with the intended path encoded in the query string;
+      // index.html then restores the original URL via history.replaceState before the app boots.
+      // Adapted from https://github.com/rafgraph/spa-github-pages
+      var pathSegmentsToKeep = 1; // keep "/portfolio" (this repo's GitHub Pages base)
+      var l = window.location;
+      l.replace(
+        l.protocol + "//" + l.hostname + (l.port ? ":" + l.port : "") +
+        l.pathname.split("/").slice(0, 1 + pathSegmentsToKeep).join("/") + "/?/" +
+        l.pathname.slice(1).split("/").slice(pathSegmentsToKeep).join("/").replace(/&/g, "~and~") +
+        (l.search ? "&" + l.search.slice(1).replace(/&/g, "~and~") : "") +
+        l.hash
+      );
+    </script>
+  </head>
+  <body></body>
+</html>

@@ -41,6 +41,50 @@ import imgTabOld from "../../assets/FASTag/Landing page/TAB - Section 2/Old FT.p
 import imgTabMyFastag from "../../assets/FASTag/Landing page/TAB - Section 2/My bank FT.png";
 import imgTabOtherFastag from "../../assets/FASTag/Landing page/TAB - Section 2/Other F T.png";
 
+// Card exploration — iteration thumbnail rows
+import imgIter1_1 from "../../assets/FASTag/Card exploration/Iteration - 1/1.png";
+import imgIter1_2 from "../../assets/FASTag/Card exploration/Iteration - 1/2.png";
+import imgIter1_3 from "../../assets/FASTag/Card exploration/Iteration - 1/3.png";
+import imgIter1_4 from "../../assets/FASTag/Card exploration/Iteration - 1/4.png";
+import imgIter1_5 from "../../assets/FASTag/Card exploration/Iteration - 1/5.png";
+import imgIter1_6 from "../../assets/FASTag/Card exploration/Iteration - 1/6.png";
+import imgIter2_1 from "../../assets/FASTag/Card exploration/Iteration - 2/1.png";
+import imgIter2_2 from "../../assets/FASTag/Card exploration/Iteration - 2/2.png";
+import imgIter2_3 from "../../assets/FASTag/Card exploration/Iteration - 2/3.png";
+import imgIter2_4 from "../../assets/FASTag/Card exploration/Iteration - 2/4.png";
+import imgIter2_5 from "../../assets/FASTag/Card exploration/Iteration - 2/5.png";
+import imgIter2_6 from "../../assets/FASTag/Card exploration/Iteration - 2/6.png";
+import imgIter3_1 from "../../assets/FASTag/Card exploration/Iteration - 3/1.png";
+import imgIter3_2 from "../../assets/FASTag/Card exploration/Iteration - 3/2.png";
+import imgIter3_3 from "../../assets/FASTag/Card exploration/Iteration - 3/3.png";
+import imgIter3_4 from "../../assets/FASTag/Card exploration/Iteration - 3/4.png";
+import imgIter3_5 from "../../assets/FASTag/Card exploration/Iteration - 3/5.png";
+
+// All FASTag details — "All states"
+import imgStateDownload from "../../assets/FASTag/My FASTag/All states/1. Download.png";
+import imgStateFleetDropdown from "../../assets/FASTag/My FASTag/All states/2. Hover on dd multiple fts.png";
+import imgStateHoverServices from "../../assets/FASTag/My FASTag/All states/3. Hover on services.png";
+
+// Filter and email FASTag history
+import imgFilterDefault from "../../assets/FASTag/My FASTag/Filter-history/1 Filter.png";
+import imgFilterFilled from "../../assets/FASTag/My FASTag/Filter-history/2 Filtered.png";
+import imgEmailDefault from "../../assets/FASTag/My FASTag/Email/1 default .png";
+import imgEmailCalendar from "../../assets/FASTag/My FASTag/Email/2. date open.png";
+import imgEmailChips from "../../assets/FASTag/My FASTag/Email/3 chip selection .png";
+import imgEmailFilled from "../../assets/FASTag/My FASTag/Email/4 filled.png";
+import imgEmailToast from "../../assets/FASTag/My FASTag/Email/5. Toast.png";
+
+// FASTag recharge
+import imgRechargeOld1 from "../../assets/FASTag/Recharge/OLD/1.png";
+import imgRechargeOld2 from "../../assets/FASTag/Recharge/OLD/2.png";
+import imgRechargeOld3 from "../../assets/FASTag/Recharge/OLD/3.png";
+import imgRechargeOld4 from "../../assets/FASTag/Recharge/OLD/4.png";
+import imgRechargeNew1 from "../../assets/FASTag/Recharge/NEW/1.png";
+import imgRechargeNew2 from "../../assets/FASTag/Recharge/NEW/2.png";
+import imgRechargeNew3 from "../../assets/FASTag/Recharge/NEW/3.png";
+import imgRechargeNew4 from "../../assets/FASTag/Recharge/NEW/4.png";
+import imgRechargeNew5 from "../../assets/FASTag/Recharge/NEW/5.png";
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 export interface CaseStudyInfo {
   index: number;
@@ -480,6 +524,73 @@ function IterationLabel({ children, mobile = false }: { children: React.ReactNod
     }}>
       {children}
     </p>
+  );
+}
+
+// Iteration thumbnail row — matches Figma's "Iteration - N" pattern: a caption above a
+// row of small same-height state thumbnails (not a big-image carousel like ImageCarousel).
+function IterationThumbnailRow({ caption, images, mobile = false }: { caption: string; images: string[]; mobile?: boolean }) {
+  return (
+    <div className="cs-img" style={{
+      display: "flex", flexDirection: "column", gap: 12,
+      width: "100%", backgroundColor: "#e7ded5", borderRadius: 8,
+      padding: mobile ? 12 : 16,
+    }}>
+      <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 6 }}>
+        <div style={{ width: 3, height: 13, borderRadius: 4, backgroundColor: "#c67d39", flexShrink: 0 }} />
+        <p className="font-jakarta font-medium" style={{ fontSize: 10, lineHeight: "13px", letterSpacing: "0.01em", color: "rgba(33,32,18,0.5)" }}>
+          {caption}
+        </p>
+      </div>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+        {images.map((src, i) => (
+          <div key={i} style={{ flex: mobile ? "1 1 28%" : "1 1 15%", minWidth: mobile ? 84 : 80 }}>
+            <StrokedImage src={src} bgColor="#e7ded5" strokeColor="#c67d39" aspectRatio="98 / 48" radius={4} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// State → treatment table (CS2 card exploration, iteration 3) — same visual language as JTBDTable.
+interface StateTreatmentRow { state: string; treatment: string; }
+
+function StateTreatmentTable({ rows, mobile = false }: { rows: StateTreatmentRow[]; mobile?: boolean }) {
+  return (
+    <div className="cs-img" style={{ display: "flex", flexDirection: "column", width: "100%", border: "1px solid #DACCBE", borderRadius: 12, overflow: "hidden" }}>
+      <div style={{ display: "flex", flexDirection: "row", alignItems: "center", width: "100%", backgroundColor: "#E3D9CE" }}>
+        <p className="font-jakarta font-semibold" style={{ flex: 1, padding: mobile ? "8px 0 8px 12px" : "8px 0 8px 16px", fontSize: 12, lineHeight: "20px", letterSpacing: "0.01em", textTransform: "uppercase", color: "#444444" }}>
+          State
+        </p>
+        <p className="font-jakarta font-semibold" style={{ flex: 1, textAlign: "center", fontSize: 12, lineHeight: "20px", letterSpacing: "0.01em", textTransform: "uppercase", color: "#444444" }}>
+          Treatment
+        </p>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", width: "100%", backgroundColor: "#E7DED5", padding: mobile ? "8px 12px" : "12px 16px", gap: 12 }}>
+        {rows.map((row, i) => (
+          <div key={i} style={{ display: "flex", flexDirection: mobile ? "column" : "row", gap: mobile ? 4 : 16 }}>
+            <p className="font-jakarta font-semibold" style={{ flex: 1, fontSize: 12, lineHeight: "16px", letterSpacing: "0.01em", color: "#444444" }}>
+              {i + 1}. {row.state}
+            </p>
+            <p className="font-jakarta font-normal" style={{ flex: 1, fontSize: 12, lineHeight: "20px", letterSpacing: "0.01em", color: "#444444" }}>
+              {row.treatment}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Simple 2x2 image grid (CS2 recharge "the problem" — old reference flows, no per-image caption)
+function ImageGrid2x2({ images }: { images: string[] }) {
+  return (
+    <div className="cs-img" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, width: "100%" }}>
+      {images.map((src, i) => (
+        <StrokedImage key={i} src={src} bgColor="#e7ded5" strokeColor="#c67d39" aspectRatio="270 / 169" />
+      ))}
+    </div>
   );
 }
 
@@ -955,17 +1066,21 @@ function CS2Content({ isMobile }: { isMobile: boolean }) {
             </BodyText>
 
             <IterationLabel mobile={m}>Iteration 1 — Started simple</IterationLabel>
-            <div className="cs-img">
-              <StrokedImage bgColor="#d19761" height={m ? 200 : 264} iconSize={32} />
-            </div>
+            <IterationThumbnailRow
+              mobile={m}
+              caption="Iteration - 1"
+              images={[imgIter1_1, imgIter1_2, imgIter1_3, imgIter1_4, imgIter1_5, imgIter1_6]}
+            />
             <BodyText mobile={m}>
               This card was the gateway to everything — all details, services, history. Get it wrong and the whole page falls apart. The first drop focused on the essentials: vehicle number, model, balance, recharge, overflow menu. The client liked it, then added to it. Urgency signals, auto-recharge status, and other bank FASTag callouts all needed to live here too.
             </BodyText>
 
             <IterationLabel mobile={m}>Iteration 2 — Absorbed the feedback</IterationLabel>
-            <div className="cs-img">
-              <StrokedImage bgColor="#d19761" height={m ? 200 : 264} iconSize={32} />
-            </div>
+            <IterationThumbnailRow
+              mobile={m}
+              caption="Iteration - 2"
+              images={[imgIter2_1, imgIter2_2, imgIter2_3, imgIter2_4, imgIter2_5, imgIter2_6]}
+            />
             <BodyText mobile={m}>
               It held for simple cases. Then an edge case surfaced: what if a user has low balance and a rejected RC simultaneously? Two unrelated error states, both needing attention, both fighting for the same space. They couldn't be merged — they were different problems requiring different actions. The card broke under the combination.
             </BodyText>
@@ -974,9 +1089,21 @@ function CS2Content({ isMobile }: { isMobile: boolean }) {
             <BodyText mobile={m}>
               The fix was giving urgency signals their own space rather than forcing them into the card body. A few more variants, shown to the client, and this was approved, yayy!
             </BodyText>
-            <div className="cs-img">
-              <StrokedImage bgColor="#d19761" height={m ? 200 : 264} iconSize={32} />
-            </div>
+            <IterationThumbnailRow
+              mobile={m}
+              caption="Iteration - 3"
+              images={[imgIter3_1, imgIter3_2, imgIter3_3, imgIter3_4, imgIter3_5]}
+            />
+            <StateTreatmentTable
+              mobile={m}
+              rows={[
+                { state: "Auto-recharge ON", treatment: "Gradient orange footer" },
+                { state: "Auto-recharge OFF", treatment: "Pastel footer with CTA" },
+                { state: "Low balance", treatment: "Inline peach pill with an icon" },
+                { state: "RC/KYC/KYV rejected/pending", treatment: "Inline warning red pill" },
+                { state: "Non-ICICI tag", treatment: "Solid grey footer, separate tab" },
+              ]}
+            />
             <BodyText mobile={m}>
               The anchor across all states: vehicle number, balance, recharge — always visible, always in the same position.
             </BodyText>
@@ -1011,14 +1138,9 @@ function CS2Content({ isMobile }: { isMobile: boolean }) {
             <BodyText mobile={m}>
               There have been various states and micro-interactions added to multiple sections of the landing. Scroll to view all the interactions.
             </BodyText>
-            <ImageCarousel
-              mobile={m}
-              slides={[
-                { caption: "Placeholder — state 1" },
-                { caption: "Placeholder — state 2" },
-                { caption: "Placeholder — state 3" },
-              ]}
-            />
+            <ImageCarousel mobile={m} slides={[{ src: imgStateDownload, caption: "Download history - button has a dropdown on hover" }]} />
+            <ImageCarousel mobile={m} slides={[{ src: imgStateFleetDropdown, caption: "For fleet owners - more than 4 will appear inside a dropdown" }]} />
+            <ImageCarousel mobile={m} slides={[{ src: imgStateHoverServices, caption: "Hovering on services will open a tooltip" }]} />
 
             <SubHeading mobile={m}>Filter and email FASTag history</SubHeading>
             <BodyText mobile={m}>
@@ -1027,8 +1149,8 @@ function CS2Content({ isMobile }: { isMobile: boolean }) {
             <ImageCarousel
               mobile={m}
               slides={[
-                { caption: "Placeholder — filter chips" },
-                { caption: "Placeholder — custom date range" },
+                { src: imgFilterDefault, caption: "Filter history - default" },
+                { src: imgFilterFilled, caption: "Filter history - filled" },
               ]}
             />
             <BodyText mobile={m}>
@@ -1037,7 +1159,11 @@ function CS2Content({ isMobile }: { isMobile: boolean }) {
             <ImageCarousel
               mobile={m}
               slides={[
-                { caption: "Placeholder — email statement" },
+                { src: imgEmailDefault, caption: "Email statement - default state" },
+                { src: imgEmailCalendar, caption: "Email statement - selecting through the calendar" },
+                { src: imgEmailChips, caption: "Email statement - selecting through chips" },
+                { src: imgEmailFilled, caption: "Email statement - filled" },
+                { src: imgEmailToast, caption: "Email statement - a toast appears on success" },
               ]}
             />
           </div>
@@ -1052,9 +1178,7 @@ function CS2Content({ isMobile }: { isMobile: boolean }) {
             <BodyText mobile={m}>
               The mobile reference flows had three separate recharge experiences depending on where the user came from — ICICI FASTag, linked non-ICICI, and first-time non-linked. Some were modals, some full-page, each with different data points. The same action looked different every time and the client pushed for an experience of keeping them as is. It was unsustainable to maintain, and expensive to build.
             </BodyText>
-            <div className="cs-img">
-              <StrokedImage bgColor="#d19761" height={m ? 200 : 264} iconSize={32} />
-            </div>
+            <ImageGrid2x2 images={[imgRechargeOld1, imgRechargeOld2, imgRechargeOld3, imgRechargeOld4]} />
 
             <IterationLabel mobile={m}>The fix</IterationLabel>
             <BodyText mobile={m}>
@@ -1073,8 +1197,11 @@ function CS2Content({ isMobile }: { isMobile: boolean }) {
             <ImageCarousel
               mobile={m}
               slides={[
-                { caption: "Placeholder — linked vehicle" },
-                { caption: "Placeholder — non-linked vehicle" },
+                { src: imgRechargeNew1, caption: "Recharge - for a user coming from the dashboard or all details page" },
+                { src: imgRechargeNew2, caption: "Recharge - for a user coming from the dashboard from the ancillary details" },
+                { src: imgRechargeNew3, caption: "Recharge - to set up AutoRecharge, the user would see use the modal" },
+                { src: imgRechargeNew4, caption: "Recharge - enters from ancillary section of the dashboard with search-as-you-type input" },
+                { src: imgRechargeNew5, caption: "Recharge - Success for both vehicle types with contextual upgrades" },
               ]}
             />
           </div>

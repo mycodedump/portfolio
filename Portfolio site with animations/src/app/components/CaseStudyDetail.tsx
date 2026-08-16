@@ -21,9 +21,20 @@ import imgMulti2 from "../../imports/FullScrollableForProjects-1/884412cdbee0580
 import imgMulti3 from "../../imports/FullScrollableForProjects-1/5c80203c3c32b2840d077bcc316d0ae47b79c6f5.png";
 
 // ─── CS2 image assets (ICICI FASTag) ──────────────────────────────────────────
-import imgFastagNonIcici from "../../assets/FASTag/1.png";
-import imgFastagAutoOff from "../../assets/FASTag/2.png";
-import imgFastagAutoOn from "../../assets/FASTag/3.png";
+import imgFastagNonIcici from "../../assets/FASTag/My FASTag/LP/1. NON UB FT.png";
+import imgFastagAutoOff from "../../assets/FASTag/My FASTag/LP/2. UB + NAR.png";
+import imgFastagAutoOn from "../../assets/FASTag/My FASTag/LP/3. UB + AR.png";
+
+// Landing page — section 1 (user/landing states)
+import imgLandingEmpty from "../../assets/FASTag/Landing page/Landing - Section 1/Landing-empty.png";
+import imgLandingExisting from "../../assets/FASTag/Landing page/Landing - Section 1/Landing - E.png";
+import imgLandingScrolled from "../../assets/FASTag/Landing page/Landing - Section 1/LPE - Scrolled.png";
+import imgLandingMenuOpen from "../../assets/FASTag/Landing page/Landing - Section 1/LPE - menu open.png";
+
+// Landing page — section 2 (the TAB decision)
+import imgTabOld from "../../assets/FASTag/Landing page/TAB - Section 2/Old FT.png";
+import imgTabMyFastag from "../../assets/FASTag/Landing page/TAB - Section 2/My bank FT.png";
+import imgTabOtherFastag from "../../assets/FASTag/Landing page/TAB - Section 2/Other F T.png";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export interface CaseStudyInfo {
@@ -173,6 +184,30 @@ export function ThumbnailPlaceholder({
   );
 }
 
+// ─── Universal image treatment: 5px-rounded, 1px white stroke sitting outside the edge ──
+// A plain `border` sits inside the box and dents the rounded clip — this draws the stroke
+// as a separate absolutely-positioned sibling instead, exactly like PhoneStrip's original technique.
+function StrokedImage({
+  src, alt = "", bgColor = "#e7ded5", strokeColor = "#c67d39", iconSize = 32,
+  aspectRatio, height, radius = 5,
+}: {
+  src?: string; alt?: string; bgColor?: string; strokeColor?: string; iconSize?: number;
+  aspectRatio?: string; height?: string | number; radius?: number;
+}) {
+  return (
+    <div style={{ position: "relative", width: "100%", ...(aspectRatio ? { aspectRatio } : { height: height ?? "100%" }) }}>
+      <div style={{ width: "100%", height: "100%", borderRadius: radius, overflow: "hidden", backgroundColor: bgColor }}>
+        {src ? (
+          <img src={src} alt={alt} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+        ) : (
+          <ThumbnailPlaceholder bgColor={bgColor} strokeColor={strokeColor} height="100%" iconSize={iconSize} />
+        )}
+      </div>
+      <div style={{ position: "absolute", inset: -1, border: "1px solid #ffffff", borderRadius: radius + 1, pointerEvents: "none" }} />
+    </div>
+  );
+}
+
 // ─── SectionBlock: scroll-reveal wrapper ─────────────────────────────────────
 function SectionBlock({ id, children }: { id: string; children: React.ReactNode }) {
   return (
@@ -306,11 +341,13 @@ function ImageCarousel({ slides, mobile = false, bgColor = "#e7ded5" }: { slides
 
   return (
     <div className="cs-img" style={{ display: "flex", flexDirection: "column", gap: mobile ? 10 : 12 }}>
-      {/* Full frame — the one active slide */}
+      {/* Full frame — the one active slide.
+          Mobile padding is stepped down in multiples of 4px (24/24/20 → 8/8/8) so the
+          image itself claims more of the available width instead of sitting in a small frame. */}
       <div
         style={{
           display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center",
-          padding: mobile ? "16px 16px 14px" : "24px 24px 20px",
+          padding: mobile ? "8px" : "24px 24px 20px",
           gap: 10,
           width: "100%",
           aspectRatio: "584 / 645",
@@ -323,19 +360,7 @@ function ImageCarousel({ slides, mobile = false, bgColor = "#e7ded5" }: { slides
           gap: mobile ? 12 : 16,
           width: "96.64%",
         }}>
-          {/* Image + its outside stroke ring: overflow-hidden box clips the 5px-rounded image,
-              a separate inset:-1 sibling draws the 1px white stroke just outside that edge —
-              a plain `border` here would sit inside the box and dent the rounded corners. */}
-          <div style={{ position: "relative", width: "100%", aspectRatio: "518 / 572", flexShrink: 0 }}>
-            <div style={{ width: "100%", height: "100%", borderRadius: 5, overflow: "hidden", backgroundColor: bgColor }}>
-              {current.src ? (
-                <img src={current.src} alt={current.caption} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-              ) : (
-                <ThumbnailPlaceholder bgColor={bgColor} strokeColor={strokeColor} height="100%" iconSize={32} />
-              )}
-            </div>
-            <div style={{ position: "absolute", inset: -1, border: "1px solid #ffffff", borderRadius: 6, pointerEvents: "none" }} />
-          </div>
+          <StrokedImage src={current.src} alt={current.caption} bgColor={bgColor} strokeColor={strokeColor} aspectRatio="518 / 572" iconSize={32} />
 
           <div style={{ display: "flex", flexDirection: "row", alignItems: "center", padding: "0 4px", gap: 6, width: "100%", flexShrink: 0 }}>
             <div style={{ width: 3, height: 13, borderRadius: 4, backgroundColor: strokeColor, flexShrink: 0 }} />
@@ -410,6 +435,87 @@ function IterationLabel({ children, mobile = false }: { children: React.ReactNod
   );
 }
 
+// ─── JTBD table (CS2 "Users and JTBD") — matches Figma "Frame 1597884686" 1:1 ──
+interface JTBDRow { job: string; context: string; }
+interface JTBDGroup { label: string; gradient: string; rows: JTBDRow[]; }
+
+const JTBD_GROUPS: JTBDGroup[] = [
+  {
+    label: "FREQUENT + TIME-SENSITIVE + SURFACED ON CARD",
+    gradient: "linear-gradient(90deg, #F2EDE8 50%, rgba(231,222,213,0.7) 100%)",
+    rows: [
+      { job: "Recharge an existing FASTag", context: "Often urgent — user may be driving toward a toll gate" },
+      { job: "Check available balance", context: "Often urgent — user may be driving toward a toll gate" },
+    ],
+  },
+  {
+    label: "OCCASIONAL + DELIBERATE + LIVES DEEPER",
+    gradient: "linear-gradient(90deg, rgba(231,222,213,0.7) 0%, #F2EDE8 50%, rgba(231,222,213,0.7) 100%)",
+    rows: [
+      { job: "Link or buy a new FASTag", context: "Considered action, done once, needs guidance" },
+      { job: "Check recharge or transaction history", context: "Review mode — user is looking back, not forward" },
+    ],
+  },
+];
+
+function JTBDTable({ mobile = false }: { mobile?: boolean }) {
+  return (
+    <div className="cs-img" style={{
+      display: "flex", flexDirection: "column",
+      width: "100%",
+      border: "1px solid #DACCBE", borderRadius: 12, overflow: "hidden",
+    }}>
+      <div style={{ display: "flex", flexDirection: "row", alignItems: "center", width: "100%", backgroundColor: "#E3D9CE" }}>
+        <p className="font-jakarta font-semibold" style={{
+          flex: 1, padding: mobile ? "8px 0 8px 12px" : "8px 0 8px 16px",
+          fontSize: 12, lineHeight: "20px", letterSpacing: "0.01em", textTransform: "uppercase", color: "#444444",
+        }}>
+          JTBD
+        </p>
+        <p className="font-jakarta font-semibold" style={{
+          flex: 1, textAlign: "center",
+          fontSize: 12, lineHeight: "20px", letterSpacing: "0.01em", textTransform: "uppercase", color: "#444444",
+        }}>
+          Context
+        </p>
+      </div>
+
+      {JTBD_GROUPS.map((group, gi) => (
+        <div key={gi} style={{ display: "flex", flexDirection: "column", width: "100%" }}>
+          <div style={{
+            display: "flex", alignItems: "flex-end", justifyContent: "center",
+            width: "100%", padding: mobile ? "8px 12px" : "8px 16px",
+            background: group.gradient,
+          }}>
+            <p className="font-jakarta font-bold" style={{
+              fontSize: 10, lineHeight: "13px", letterSpacing: "1px", textTransform: "uppercase",
+              color: "#735933", textAlign: "center",
+            }}>
+              {group.label}
+            </p>
+          </div>
+          <div style={{
+            display: "flex", flexDirection: "column",
+            width: "100%", backgroundColor: "#E7DED5",
+            padding: mobile ? "8px 12px" : "12px 16px", gap: 12,
+          }}>
+            {group.rows.map((row, ri) => (
+              <div key={ri} style={{ display: "flex", flexDirection: mobile ? "column" : "row", gap: mobile ? 4 : 16 }}>
+                <p className="font-jakarta font-semibold" style={{ flex: 1, fontSize: 12, lineHeight: "16px", letterSpacing: "0.01em", color: "#444444" }}>
+                  {row.job}
+                </p>
+                <p className="font-jakarta font-normal" style={{ flex: 1, fontSize: 12, lineHeight: "20px", letterSpacing: "0.01em", color: "#444444" }}>
+                  {row.context}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function HMWBullet({ num, text, mobile = false }: { num: number; text: string; mobile?: boolean }) {
   return (
     <div style={{ backgroundColor: "rgba(198,125,57,0.1)", borderRadius: 8, border: "1px solid rgba(198,125,57,0.3)", overflow: "hidden", display: "flex", alignItems: "center" }}>
@@ -467,7 +573,7 @@ function PhoneStrip({
               }}
             >
               <img src={img.src} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 5 }} />
-              <div style={{ position: "absolute", inset: -1, border: "1px solid rgba(255,255,255,0.8)", borderRadius: 6, pointerEvents: "none" }} />
+              <div style={{ position: "absolute", inset: -1, border: "1px solid #ffffff", borderRadius: 6, pointerEvents: "none" }} />
             </div>
           );
         })}
@@ -642,8 +748,11 @@ function CS1Content({ isMobile }: { isMobile: boolean }) {
           <SectionHeading mobile={m}>Getting users into the flow, before they ever need it</SectionHeading>
           <div className="cs-flow" style={{ display: "flex", flexDirection: "column" }}>
             <BodyText mobile={m}>Most ICICI cardholders barely open the iMobile app — bill payments happen through third-party apps like CRED, PhonePe, GPay. If iTravel only lived inside the app, it would only reach people already looking for it.</BodyText>
-            <div className="cs-img" style={{ borderRadius: 8, overflow: "hidden" }}>
-              <img src={imgFlowChart} alt="Multi-channel entry points" style={{ width: "100%", height: m ? "auto" : 389, objectFit: "cover", borderRadius: 8, display: "block" }} />
+            <div className="cs-img" style={{ position: "relative", width: "100%" }}>
+              <div style={{ borderRadius: 5, overflow: "hidden" }}>
+                <img src={imgFlowChart} alt="Multi-channel entry points" style={{ width: "100%", height: m ? "auto" : 389, objectFit: "cover", display: "block" }} />
+              </div>
+              <div style={{ position: "absolute", inset: -1, border: "1px solid #ffffff", borderRadius: 6, pointerEvents: "none" }} />
             </div>
             <SubHeading mobile={m}>Force modals for different user types</SubHeading>
             <PhoneStrip
@@ -705,6 +814,12 @@ function CS2Content({ isMobile }: { isMobile: boolean }) {
               I designed the entire FASTag experience for RIB from scratch. No brief. No precedent. Just iMobile's existing flows as reference, a fixed two-week deadline, and three distinct user types that needed to coexist on the same platform.
             </BodyText>
 
+            <SectionHeading mobile={m}>Users and JTBD</SectionHeading>
+            <BodyText mobile={m}>
+              With the reference I had, before designing the screens, I mapped four core jobs users come to FASTag to do. These drove every layout and hierarchy decision that followed.
+            </BodyText>
+            <JTBDTable mobile={m} />
+
             <SectionHeading mobile={m}>It's 11pm on the highway, and the toll is ahead</SectionHeading>
 
             <BodyText mobile={m}>
@@ -742,6 +857,16 @@ function CS2Content({ isMobile }: { isMobile: boolean }) {
               <li>Fleet owners (ICICI Bank and non-ICICI Bank)</li>
             </ul>
 
+            <ImageCarousel
+              mobile={m}
+              slides={[
+                { src: imgLandingEmpty, caption: "New user with no FASTags" },
+                { src: imgLandingExisting, caption: "Existing user with ICICI Bank and other bank FASTag" },
+                { src: imgLandingScrolled, caption: "Critical usecase, scrolled state — callout for critical action" },
+                { src: imgLandingMenuOpen, caption: "Three-dot menu open state" },
+              ]}
+            />
+
             <SectionHeading mobile={m}>The TAB decision</SectionHeading>
             <BodyText mobile={m}>
               Early versions showed all FASTags in one mixed list — ICICI and non-ICICI together, sorted by recency. The problem: a just-linked third-party FASTag would float to the top, pushing the user's ICICI card down the scroll. Wrong for the user. Wrong for the bank.
@@ -750,9 +875,14 @@ function CS2Content({ isMobile }: { isMobile: boolean }) {
               Splitting into two tabs — My FASTag and Other bank FASTag — solved both at once. ICICI cards always surface first. The tab structure tells the user what service level to expect before they open a single card.
             </BodyText>
 
-            <div className="cs-img" style={{ height: m ? 200 : 264, backgroundColor: "#d19761", borderRadius: 8, overflow: "hidden" }}>
-              <ThumbnailPlaceholder bgColor="#d19761" strokeColor="#212012" height={m ? 200 : 264} iconSize={32} />
-            </div>
+            <ImageCarousel
+              mobile={m}
+              slides={[
+                { src: imgTabOld, caption: "Before — mixed list, no tabs" },
+                { src: imgTabMyFastag, caption: "My FASTag tab" },
+                { src: imgTabOtherFastag, caption: "Other bank FASTag tab" },
+              ]}
+            />
           </div>
         </div>
       </SectionBlock>
@@ -772,16 +902,16 @@ function CS2Content({ isMobile }: { isMobile: boolean }) {
             </BodyText>
 
             <IterationLabel mobile={m}>Iteration 1 — Started simple</IterationLabel>
-            <div className="cs-img" style={{ height: m ? 200 : 264, backgroundColor: "#d19761", borderRadius: 8, overflow: "hidden" }}>
-              <ThumbnailPlaceholder bgColor="#d19761" strokeColor="#212012" height={m ? 200 : 264} iconSize={32} />
+            <div className="cs-img">
+              <StrokedImage bgColor="#d19761" height={m ? 200 : 264} iconSize={32} />
             </div>
             <BodyText mobile={m}>
               This card was the gateway to everything — all details, services, history. Get it wrong and the whole page falls apart. The first drop focused on the essentials: vehicle number, model, balance, recharge, overflow menu. The client liked it, then added to it. Urgency signals, auto-recharge status, and other bank FASTag callouts all needed to live here too.
             </BodyText>
 
             <IterationLabel mobile={m}>Iteration 2 — Absorbed the feedback</IterationLabel>
-            <div className="cs-img" style={{ height: m ? 200 : 264, backgroundColor: "#d19761", borderRadius: 8, overflow: "hidden" }}>
-              <ThumbnailPlaceholder bgColor="#d19761" strokeColor="#212012" height={m ? 200 : 264} iconSize={32} />
+            <div className="cs-img">
+              <StrokedImage bgColor="#d19761" height={m ? 200 : 264} iconSize={32} />
             </div>
             <BodyText mobile={m}>
               It held for simple cases. Then an edge case surfaced: what if a user has low balance and a rejected RC simultaneously? Two unrelated error states, both needing attention, both fighting for the same space. They couldn't be merged — they were different problems requiring different actions. The card broke under the combination.
@@ -791,8 +921,8 @@ function CS2Content({ isMobile }: { isMobile: boolean }) {
             <BodyText mobile={m}>
               The fix was giving urgency signals their own space rather than forcing them into the card body. A few more variants, shown to the client, and this was approved, yayy!
             </BodyText>
-            <div className="cs-img" style={{ height: m ? 200 : 264, backgroundColor: "#d19761", borderRadius: 8, overflow: "hidden" }}>
-              <ThumbnailPlaceholder bgColor="#d19761" strokeColor="#212012" height={m ? 200 : 264} iconSize={32} />
+            <div className="cs-img">
+              <StrokedImage bgColor="#d19761" height={m ? 200 : 264} iconSize={32} />
             </div>
             <BodyText mobile={m}>
               The anchor across all states: vehicle number, balance, recharge — always visible, always in the same position.
@@ -869,8 +999,8 @@ function CS2Content({ isMobile }: { isMobile: boolean }) {
             <BodyText mobile={m}>
               The mobile reference flows had three separate recharge experiences depending on where the user came from — ICICI FASTag, linked non-ICICI, and first-time non-linked. Some were modals, some full-page, each with different data points. The same action looked different every time and the client pushed for an experience of keeping them as is. It was unsustainable to maintain, and expensive to build.
             </BodyText>
-            <div className="cs-img" style={{ height: m ? 200 : 264, backgroundColor: "#d19761", borderRadius: 8, overflow: "hidden" }}>
-              <ThumbnailPlaceholder bgColor="#d19761" strokeColor="#212012" height={m ? 200 : 264} iconSize={32} />
+            <div className="cs-img">
+              <StrokedImage bgColor="#d19761" height={m ? 200 : 264} iconSize={32} />
             </div>
 
             <IterationLabel mobile={m}>The fix</IterationLabel>
@@ -934,8 +1064,8 @@ function PlaceholderContent({ cs, isMobile }: { cs: CaseStudyInfo; isMobile: boo
             <SectionHeading mobile={m}>{labels[i]}</SectionHeading>
             <div className="cs-flow" style={{ display: "flex", flexDirection: "column" }}>
               <BodyText mobile={m}>{cs.overview}</BodyText>
-              <div className="cs-img" style={{ height: placeholders[i].h, backgroundColor: placeholders[i].bg, borderRadius: 8, overflow: "hidden" }}>
-                <ThumbnailPlaceholder bgColor={placeholders[i].bg === "#ffffff" ? cs.imageBg : placeholders[i].bg} strokeColor={cs.textColor} height={placeholders[i].h} iconSize={32} />
+              <div className="cs-img">
+                <StrokedImage bgColor={placeholders[i].bg === "#ffffff" ? cs.imageBg : placeholders[i].bg} strokeColor={cs.textColor} height={placeholders[i].h} iconSize={32} />
               </div>
             </div>
           </div>

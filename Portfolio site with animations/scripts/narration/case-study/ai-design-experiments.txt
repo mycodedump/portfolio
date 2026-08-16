@@ -1,0 +1,3 @@
+I wanted to know how generative AI could augment a design process without stripping away creative ownership, so I ran a six-week self-initiated study, exploring where AI genuinely sped up early-stage exploration versus where it just produced plausible-looking noise. Eight external designers joined the workshop format that came out of it.
+
+The result was roughly three times faster first prototypes, but the more useful finding was about where the human judgment still had to sit: framing the problem, deciding what to explore, and knowing which AI-generated direction was actually worth pursuing. That workshop format is now being adapted internally.

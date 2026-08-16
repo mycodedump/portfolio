@@ -2,6 +2,11 @@ import { useRef, useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X, Play, Pause, Volume2 } from "lucide-react";
 import { useIsMobile } from "@/app/useIsMobile";
+import { useAudioPlayer } from "@/app/useAudioPlayer";
+
+// Pre-generated ElevenLabs narration lives in public/audio/ (see scripts/generate-voiceovers.mjs)
+// — base-aware so it resolves correctly whether served at "/" locally or "/portfolio/" on GitHub Pages.
+export const caseStudyAudioUrl = (slug: string) => `${import.meta.env.BASE_URL}audio/case-study/${slug}.mp3`;
 
 // ─── CS1 image assets (ICICI Bank) ────────────────────────────────────────────
 import imgStrip1A from "../../imports/FullScrollableForProjects-1/93e70105f7d066f588dc4dbef15d865a2e5d4066.png";
@@ -332,7 +337,7 @@ interface CarouselSlide {
   caption: string;
 }
 
-function ImageCarousel({ slides, mobile = false, bgColor = "#e7ded5" }: { slides: CarouselSlide[]; mobile?: boolean; bgColor?: string }) {
+function ImageCarousel({ slides, mobile = false, bgColor = "#e7ded5", maxWidth }: { slides: CarouselSlide[]; mobile?: boolean; bgColor?: string; maxWidth?: number }) {
   const [active, setActive] = useState(0);
   const current = slides[active];
   const strokeColor = "#c67d39";
@@ -340,7 +345,7 @@ function ImageCarousel({ slides, mobile = false, bgColor = "#e7ded5" }: { slides
   const thumbH = mobile ? 32 : 40;
 
   return (
-    <div className="cs-img" style={{ display: "flex", flexDirection: "column", gap: mobile ? 10 : 12 }}>
+    <div className="cs-img" style={{ display: "flex", flexDirection: "column", gap: mobile ? 10 : 12, width: "100%", maxWidth: mobile ? undefined : maxWidth }}>
       {/* Full frame — the one active slide.
           Mobile padding is stepped down in multiples of 4px (24/24/20 → 8/8/8) so the
           image itself claims more of the available width instead of sitting in a small frame. */}
@@ -417,6 +422,49 @@ function ImageCarousel({ slides, mobile = false, bgColor = "#e7ded5" }: { slides
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+// Before/after comparison panel — matches Figma "Frame 1597884703" 1:1 (584×298 @ desktop):
+// a single "before" image on top (#E7DED5), two "after" images side by side below (#ECE6DF),
+// each with its own caption. Percentages/aspect-ratio driven so it scales proportionally on mobile.
+function LandingComparisonPanel({
+  before, beforeCaption, after, afterCaption,
+}: {
+  before?: string; beforeCaption: string; after: [string?, string?]; afterCaption: string;
+}) {
+  const strokeColor = "#c67d39";
+  const captionRow = (text: string) => (
+    <div style={{ display: "flex", flexDirection: "row", alignItems: "center", padding: "0 4px", gap: 6, width: "100%", flexShrink: 0 }}>
+      <div style={{ width: 3, height: 13, borderRadius: 4, backgroundColor: strokeColor, flexShrink: 0 }} />
+      <p className="font-jakarta font-medium" style={{ fontSize: 10, lineHeight: "13px", letterSpacing: "0.01em", color: "rgba(33,32,18,0.5)" }}>
+        {text}
+      </p>
+    </div>
+  );
+
+  return (
+    <div className="cs-img" style={{ display: "flex", flexDirection: "column", width: "100%", borderRadius: 8, overflow: "hidden" }}>
+      <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "24px 0 20px", gap: 10, width: "100%", backgroundColor: "#e7ded5" }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 12, width: "45.72%" }}>
+          <StrokedImage src={before} bgColor="#e7ded5" strokeColor={strokeColor} aspectRatio="267 / 80" />
+          {captionRow(beforeCaption)}
+        </div>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "24px 0 20px", gap: 10, width: "100%", backgroundColor: "#ece6df" }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 12, width: "84.93%" }}>
+          <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 24, width: "100%" }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <StrokedImage src={after[0]} bgColor="#ece6df" strokeColor={strokeColor} aspectRatio="236 / 80" />
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <StrokedImage src={after[1]} bgColor="#ece6df" strokeColor={strokeColor} aspectRatio="236 / 80" />
+            </div>
+          </div>
+          {captionRow(afterCaption)}
+        </div>
+      </div>
     </div>
   );
 }
@@ -627,8 +675,8 @@ function PhoneStrip({
 }
 
 // ─── Audio player ─────────────────────────────────────────────────────────────
-function AudioPlayer({ color }: { color: string }) {
-  const [playing, setPlaying] = useState(false);
+function AudioPlayer({ color, slug }: { color: string; slug: string }) {
+  const { playing, toggle, seekToFraction, available, progress, timeLabel } = useAudioPlayer(caseStudyAudioUrl(slug));
   return (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", gap: 12 }}>
       <p className="font-jakarta font-medium" style={{ fontSize: 11, color: "rgba(227,217,206,0.5)", letterSpacing: "0.5px", textTransform: "uppercase" }}>
@@ -636,15 +684,24 @@ function AudioPlayer({ color }: { color: string }) {
       </p>
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
         <button
-          onClick={() => setPlaying(!playing)}
-          style={{ width: 34, height: 34, borderRadius: "50%", backgroundColor: color, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}
+          onClick={toggle}
+          disabled={!available}
+          style={{ width: 34, height: 34, borderRadius: "50%", backgroundColor: color, border: "none", cursor: available ? "pointer" : "not-allowed", opacity: available ? 1 : 0.4, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}
         >
           {playing ? <Pause size={14} fill="#212012" color="#212012" /> : <Play size={14} fill="#212012" color="#212012" />}
         </button>
-        <div style={{ flex: 1, height: 2, backgroundColor: "rgba(227,217,206,0.18)", borderRadius: 1, position: "relative" }}>
-          <div style={{ width: "28%", height: "100%", backgroundColor: color, borderRadius: 1 }} />
+        <div
+          onClick={(e) => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            seekToFraction((e.clientX - rect.left) / rect.width);
+          }}
+          style={{ flex: 1, height: 2, backgroundColor: "rgba(227,217,206,0.18)", borderRadius: 1, position: "relative", cursor: available ? "pointer" : "default" }}
+        >
+          <div style={{ width: `${progress * 100}%`, height: "100%", backgroundColor: color, borderRadius: 1 }} />
         </div>
-        <p className="font-jakarta" style={{ fontSize: 11, color: "rgba(227,217,206,0.4)", letterSpacing: "0.1px", flexShrink: 0 }}>1:24 / 3:52</p>
+        <p className="font-jakarta" style={{ fontSize: 11, color: "rgba(227,217,206,0.4)", letterSpacing: "0.1px", flexShrink: 0 }}>
+          {available ? timeLabel : "narration coming soon"}
+        </p>
         <Volume2 size={13} color="rgba(227,217,206,0.35)" style={{ flexShrink: 0 }} />
       </div>
     </div>
@@ -856,6 +913,7 @@ function CS2Content({ isMobile }: { isMobile: boolean }) {
 
             <ImageCarousel
               mobile={m}
+              maxWidth={324}
               slides={[
                 { src: imgLandingEmpty, caption: "New user with no FASTags" },
                 { src: imgLandingExisting, caption: "Existing user with ICICI Bank and other bank FASTag" },
@@ -872,13 +930,11 @@ function CS2Content({ isMobile }: { isMobile: boolean }) {
               Splitting into two tabs — My FASTag and Other bank FASTag — solved both at once. ICICI cards always surface first. The tab structure tells the user what service level to expect before they open a single card.
             </BodyText>
 
-            <ImageCarousel
-              mobile={m}
-              slides={[
-                { src: imgTabOld, caption: "Before — mixed list, no tabs" },
-                { src: imgTabMyFastag, caption: "My FASTag tab" },
-                { src: imgTabOtherFastag, caption: "Other bank FASTag tab" },
-              ]}
+            <LandingComparisonPanel
+              before={imgTabOld}
+              beforeCaption="Old design - all cards stacked by recency"
+              after={[imgTabMyFastag, imgTabOtherFastag]}
+              afterCaption="Tabs created to seperate the FASTags"
             />
           </div>
         </div>
@@ -1073,20 +1129,22 @@ function PlaceholderContent({ cs, isMobile }: { cs: CaseStudyInfo; isMobile: boo
 }
 
 // ─── Left panel audio button ──────────────────────────────────────────────────
-function LeftPanelAudio({ color }: { color: string }) {
-  const [playing, setPlaying] = useState(false);
+function LeftPanelAudio({ color, slug }: { color: string; slug: string }) {
+  const { playing, toggle, available, timeLabel } = useAudioPlayer(caseStudyAudioUrl(slug));
   return (
     <div style={{ paddingTop: 4 }}>
       <p className="font-jakarta font-normal" style={{ fontSize: 11, letterSpacing: "0.5px", color: "rgba(33,32,18,0.4)", textTransform: "uppercase", marginBottom: 8 }}>
         listen
       </p>
       <button
-        onClick={() => setPlaying(!playing)}
+        onClick={toggle}
+        disabled={!available}
         style={{
           display: "flex", alignItems: "center", gap: 8,
           backgroundColor: playing ? color : "rgba(33,32,18,0.06)",
           border: "none", borderRadius: 10, padding: "10px 14px",
-          cursor: "pointer", transition: "background 0.2s", width: "100%",
+          cursor: available ? "pointer" : "not-allowed", opacity: available ? 1 : 0.5,
+          transition: "background 0.2s", width: "100%",
         }}
       >
         <div style={{ width: 28, height: 28, borderRadius: "50%", backgroundColor: playing ? "rgba(255,255,255,0.3)" : color, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -1094,10 +1152,10 @@ function LeftPanelAudio({ color }: { color: string }) {
         </div>
         <div style={{ textAlign: "left" }}>
           <p className="font-jakarta font-semibold" style={{ fontSize: 12, color: "#212012", lineHeight: "15px" }}>
-            {playing ? "Playing..." : "Hear this case study"}
+            {!available ? "Narration coming soon" : playing ? "Playing..." : "Hear this case study"}
           </p>
           <p className="font-jakarta" style={{ fontSize: 10, color: "rgba(33,32,18,0.5)", marginTop: 1 }}>
-            {playing ? "audio narrative" : "~8 min · audio narrative"}
+            {available ? (playing ? timeLabel : "audio narrative") : "check back soon"}
           </p>
         </div>
       </button>
@@ -1290,7 +1348,7 @@ export function CaseStudyDetail({ caseStudy, onClose, onNavigate }: Props) {
                       style={{ backgroundColor: "#212012", borderRadius: 12, padding: 16, display: "flex", flexDirection: "column", gap: 16, marginTop: 8 }}
                     >
                       {/* Audio player full-width on mobile */}
-                      <AudioPlayer color={caseStudy.color} />
+                      <AudioPlayer color={caseStudy.color} slug={caseStudy.slug} />
                     </motion.div>
 
                     {/* Related case studies — vertical stack on mobile */}
@@ -1361,7 +1419,7 @@ export function CaseStudyDetail({ caseStudy, onClose, onNavigate }: Props) {
                         <MetaField label="Team:" value={caseStudy.crossTeam} />
                         <MetaField label="Timeline:" value={caseStudy.timeline} />
                         <MetaField label="Status:" value={caseStudy.statusFull} />
-                        <LeftPanelAudio color={caseStudy.color} />
+                        <LeftPanelAudio color={caseStudy.color} slug={caseStudy.slug} />
                       </div>
 
                       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -1418,7 +1476,7 @@ export function CaseStudyDetail({ caseStudy, onClose, onNavigate }: Props) {
                         style={{ marginTop: 48, marginBottom: 8, backgroundColor: "#212012", borderRadius: 16, padding: 24, display: "flex", gap: 20, alignItems: "center", scrollMarginTop: 88 }}
                       >
                         <VideoFrame cs={caseStudy} />
-                        <AudioPlayer color={caseStudy.color} />
+                        <AudioPlayer color={caseStudy.color} slug={caseStudy.slug} />
                       </motion.div>
                     </div>
                   </div>

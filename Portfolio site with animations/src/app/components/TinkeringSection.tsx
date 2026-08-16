@@ -1,6 +1,5 @@
-import { useRef, useState, useEffect } from "react";
-import { motion, useTransform, AnimatePresence } from "motion/react";
-import { useScrollProgress } from "../ScrollContext";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import { useIsMobile } from "../useIsMobile";
 import { BLOG_POSTS, type BlogPost, type BlogCategory } from "./BlogDetail";
 
@@ -15,7 +14,6 @@ function withMartel(text: string) {
   );
 }
 import { BlogPostDrawer } from "./BlogPostDrawer";
-import imgPhoto from "figma:asset/4dfdf49b488289ec55070ff65a3c23b4f7ef8355.png";
 
 const CHIPS: BlogCategory[] = ["write about design", "personal musings", "life in a nutshell"];
 
@@ -77,13 +75,9 @@ function BlogListItem({ post, isNewest, onClick }: { post: BlogPost; isNewest: b
 }
 
 export function TinkeringSection() {
-  const photoRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
   const [activeChip, setActiveChip] = useState<BlogCategory | null>(null);
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
-
-  const scrollYProgress = useScrollProgress(photoRef, ["start end", "end start"]);
-  const imageY = useTransform(scrollYProgress, [0, 1], [-80, 80]);
 
   const filtered = activeChip ? BLOG_POSTS.filter((p) => p.category === activeChip) : BLOG_POSTS;
 

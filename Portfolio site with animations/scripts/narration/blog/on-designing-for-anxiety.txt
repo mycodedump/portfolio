@@ -1,0 +1,9 @@
+Every interaction in a banking app is a high-stakes moment. People aren't casually scrolling, they're checking if their rent cleared, seeing if they have enough for groceries, watching their savings inch toward a goal that feels impossibly far away.
+
+The emotional weight of money is something most financial product teams I've worked with significantly underestimate. The UX review is about clarity and efficiency. It rarely asks: what is the user feeling right now, and what do they need to feel instead?
+
+Anxiety drives bad decisions. When people feel uncertain, they either over-act, obsessively refreshing balances, or freeze, avoiding the app entirely. Good financial UX reduces uncertainty. It gives people the minimum information they need to feel in control, at the moment they need it.
+
+The most impactful change I made to the ICICI onboarding flow wasn't a visual redesign, it was adding a single progress indicator that showed users exactly where they were in the KYC process. Completion rates went up. Support tickets about "what happens next" dropped by forty percent.
+
+Designing for anxiety means designing for the emotional journey, not just the task. What does a person feel at this step? What do they fear? What would make them feel safe enough to continue? Answer those questions and the visual design almost solves itself.

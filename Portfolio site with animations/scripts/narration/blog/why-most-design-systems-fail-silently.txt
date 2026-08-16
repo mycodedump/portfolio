@@ -1,0 +1,9 @@
+Design systems are sold as the silver bullet, build once, use everywhere, maintain sanity. And yet, three years into running the design system at a fintech, I watched it quietly collect dust. The components were good. The documentation was thorough. Nobody used it.
+
+The failure wasn't technical. It was cultural. Design systems don't fail because the tokens are wrong or the spacing grid is off. They fail because no one owns the contract between the system and the teams consuming it.
+
+What I learned: a design system is a product, not a library. It needs a roadmap, a support channel, office hours, and champions inside each product team. Without that infrastructure, even the most technically elegant system becomes shelfware.
+
+The teams that succeeded had one thing in common: someone whose job it was to make the system easy to adopt. Not just easy to use, easy to adopt. Those are different problems. Adoption is about trust, communication, and reducing the friction of change. Usage is about API design and documentation.
+
+If you're starting a design system, hire for adoption first. The engineering can always be refactored. The culture cannot.

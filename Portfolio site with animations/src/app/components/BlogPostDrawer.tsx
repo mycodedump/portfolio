@@ -1,9 +1,17 @@
 import { useRef, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { X } from "lucide-react";
+import { X, Play, Pause } from "lucide-react";
 import { BLOG_POSTS, type BlogPost } from "./BlogDetail";
+import { useAudioPlayer } from "@/app/useAudioPlayer";
+import { useWordTimings, type WordTiming } from "@/app/useWordTimings";
 
 const MARTEL = { fontFamily: "'Martel', serif", fontWeight: 600 };
+
+// Pre-generated ElevenLabs narration + word timing live in public/audio/blog/
+// (see scripts/generate-voiceovers.mjs) — base-aware so it resolves whether
+// served at "/" locally or "/portfolio/" on GitHub Pages.
+const blogAudioUrl = (slug: string) => `${import.meta.env.BASE_URL}audio/blog/${slug}.mp3`;
+const blogWordsUrl = (slug: string) => `${import.meta.env.BASE_URL}audio/blog/${slug}.words.json`;
 
 // Wraps every occurrence of सुकून in a Martel span so the Devanagari word
 // always renders in the correct typeface regardless of surrounding font.
@@ -14,6 +22,65 @@ function withMartel(text: string) {
     i < parts.length - 1
       ? [part, <span key={i} style={MARTEL}>सुकून</span>]
       : [part]
+  );
+}
+
+// Renders one paragraph with a per-word karaoke-style highlight synced to audio
+// playback (Spotify-lyrics style) once timing data has loaded; falls back to
+// plain text (still Martel-aware) before narration/timings exist for this post.
+function HighlightedParagraph({ text, timing, currentTime }: { text: string; timing?: WordTiming[]; currentTime: number }) {
+  if (!timing || timing.length === 0) return <>{withMartel(text)}</>;
+
+  const activeIndex = timing.findIndex((w) => currentTime >= w.start && currentTime < w.end);
+
+  return (
+    <>
+      {timing.map((w, i) => (
+        <span key={i}>
+          <span
+            style={{
+              backgroundColor: i === activeIndex ? "rgba(198,125,57,0.12)" : "transparent",
+              borderRadius: 2,
+              transition: "background-color 0.1s ease",
+            }}
+          >
+            {w.word === "सुकून" ? <span style={MARTEL}>{w.word}</span> : w.word}
+          </span>{" "}
+        </span>
+      ))}
+    </>
+  );
+}
+
+function BlogAudioPlayer({ slug, currentTimeRef }: { slug: string; currentTimeRef: (t: number) => void }) {
+  const { playing, toggle, seekToFraction, available, progress, timeLabel, currentTime } = useAudioPlayer(blogAudioUrl(slug));
+
+  useEffect(() => {
+    currentTimeRef(currentTime);
+  }, [currentTime, currentTimeRef]);
+
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 28 }}>
+      <button
+        onClick={toggle}
+        disabled={!available}
+        style={{ width: 32, height: 32, borderRadius: "50%", backgroundColor: "#c3be6f", border: "none", cursor: available ? "pointer" : "not-allowed", opacity: available ? 1 : 0.4, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}
+      >
+        {playing ? <Pause size={13} fill="#212012" color="#212012" /> : <Play size={13} fill="#212012" color="#212012" />}
+      </button>
+      <div
+        onClick={(e) => {
+          const rect = e.currentTarget.getBoundingClientRect();
+          seekToFraction((e.clientX - rect.left) / rect.width);
+        }}
+        style={{ flex: 1, height: 2, backgroundColor: "rgba(33,32,18,0.1)", borderRadius: 1, position: "relative", cursor: available ? "pointer" : "default" }}
+      >
+        <div style={{ width: `${progress * 100}%`, height: "100%", backgroundColor: "#c3be6f", borderRadius: 1 }} />
+      </div>
+      <p className="font-jakarta" style={{ fontSize: 11, color: "#625e37", opacity: 0.6, letterSpacing: "0.1px", flexShrink: 0 }}>
+        {available ? timeLabel : "narration coming soon"}
+      </p>
+    </div>
   );
 }
 
@@ -71,24 +138,17 @@ function RelatedBlogLink({ post, isLast, onClick }: { post: BlogPost; isLast: bo
 export function BlogPostDrawer({ post, onClose, onNavigate }: BlogPostDrawerProps) {
   const scrollableRef = useRef<HTMLDivElement>(null);
   const [scrolled, setScrolled] = useState(false);
+  const [audioTime, setAudioTime] = useState(0);
+  const wordTimings = useWordTimings(blogWordsUrl(post?.slug ?? ""));
 
   useEffect(() => {
     if (post) {
       const el = scrollableRef.current;
       if (el) el.scrollTop = 0;
       setScrolled(false);
+      setAudioTime(0);
     }
   }, [post?.id]);
-
-  // Esc closes the drawer the same way the close icon does.
-  useEffect(() => {
-    if (!post) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [post, onClose]);
 
   const related = post ? BLOG_POSTS.filter((p) => p.id !== post.id) : [];
 
@@ -171,9 +231,10 @@ export function BlogPostDrawer({ post, onClose, onNavigate }: BlogPostDrawerProp
 
               {/* Body */}
               <div style={{ padding: "28px 52px 40px 36px" }}>
-                <p className="font-jakarta" style={{ fontSize: 16, lineHeight: "25px", color: "#625e37", opacity: 0.9, marginBottom: 28 }}>
+                <p className="font-jakarta" style={{ fontSize: 16, lineHeight: "25px", color: "#625e37", opacity: 0.9, marginBottom: 20 }}>
                   {post.subtitle}
                 </p>
+                <BlogAudioPlayer slug={post.slug} currentTimeRef={setAudioTime} />
                 <div style={{ height: 1, backgroundColor: "rgba(33,32,18,0.1)", marginBottom: 32 }} />
                 <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
                   {post.body.map((para, i) => (
@@ -186,7 +247,11 @@ export function BlogPostDrawer({ post, onClose, onNavigate }: BlogPostDrawerProp
                       className="font-caslon not-italic"
                       style={{ fontSize: 17, lineHeight: "30px", color: "#212012", opacity: 0.85 }}
                     >
-                      {typeof para === "string" ? withMartel(para) : para}
+                      {typeof para === "string" ? (
+                        <HighlightedParagraph text={para} timing={wordTimings?.[i]} currentTime={audioTime} />
+                      ) : (
+                        para
+                      )}
                     </motion.p>
                   ))}
                 </div>

@@ -1,0 +1,9 @@
+Figma is where ideas go to feel finished before they're ready. I've spent hundreds of hours pixel-pushing prototypes that felt airtight in review and fell apart the moment they hit real users with real data.
+
+The problem is that prototypes are optimistic. You design for the happy path with clean data, ideal string lengths, and a cooperative user who reads every word. Reality is messier.
+
+I started advocating for shorter fidelity cycles, rough wireframes straight into staging, with real API data, real error states, real empty states. The feedback loops got faster. The surprises got smaller.
+
+This isn't an argument against prototyping. High-fidelity exploration still has its place, especially for complex interactions where the cost of getting it wrong in code is high. But the default shouldn't be "finish the prototype." It should be "what's the cheapest way to learn if this direction is right?"
+
+The best design tool I have right now is a browser with DevTools open and a production dataset. That's where the real design work happens.

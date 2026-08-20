@@ -1,7 +1,24 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { X, ExternalLink } from "lucide-react";
+import gsap from "gsap";
+import confetti from "canvas-confetti";
+import { X, ExternalLink, RotateCcw } from "lucide-react";
 import { useIsMobile } from "@/app/useIsMobile";
+import { Polaroid } from "@/app/components/Polaroid";
+import myPhoto from "../../assets/my-photo.jpg";
+import photoSketchbook from "../../assets/My photos/20260425_202946 1.jpg";
+import photoBookshelf from "../../assets/My photos/20260803_120329 1.jpg";
+import photoDosa from "../../assets/My photos/20251125_173441 1.jpg";
+import photoVietnam from "../../assets/My photos/IMG_20250816_120031_492 1.jpg";
+
+const SCRAPBOOK = [
+  { src: photoSketchbook, caption: "sketching", rot: -7 },
+  { src: photoBookshelf, caption: "currently reading", rot: 4 },
+  { src: photoDosa, caption: "sunday dosa", rot: -3 },
+  { src: photoVietnam, caption: "hanoi coffee", rot: 6 },
+];
+
+const PALETTE = ["#c3be6f", "#c67d39", "#dda1ae", "#212012"];
 
 // ── Work experience data ───────────────────────────────────────────────────────
 
@@ -52,11 +69,101 @@ const EXPERIENCE = [
   },
 ];
 
-// ── ExperienceCard ─────────────────────────────────────────────────────────────
+// ── Fun facts (flip cards, replaces the old wall-of-paragraphs bio) ───────────
+
+const FACTS = [
+  {
+    emoji: "🚀",
+    front: "3 years",
+    back: "shipping real product from day one — most of it inside ICICI Bank's ecosystem across 100+ flows and 10M+ users.",
+    color: "#c3be6f",
+  },
+  {
+    emoji: "🌊",
+    front: "the messy middle",
+    back: "I like problems with real stakes — banking, healthcare, fintech — where design, product and engineering blur into one thing.",
+    color: "#c67d39",
+  },
+  {
+    emoji: "🤖",
+    front: "outside of work",
+    back: "I write, sketch, and mess around with AI — trying to figure out what it can actually do before everyone else does.",
+    color: "#dda1ae",
+  },
+  {
+    emoji: "🎯",
+    front: "right now",
+    back: "looking for a startup worth getting obsessed over. If that's you — say hi.",
+    color: "#212012",
+  },
+];
+
+// ── FactCard — tap to flip in 3D ────────────────────────────────────────────
+
+function FactCard({ fact, index, isMobile, onFlip }: { fact: typeof FACTS[0]; index: number; isMobile: boolean; onFlip: (i: number) => void }) {
+  const [flipped, setFlipped] = useState(false);
+  const m = isMobile;
+  const h = m ? 108 : 124;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 14, rotate: -3 }}
+      whileInView={{ opacity: 1, y: 0, rotate: 0 }}
+      viewport={{ once: true, margin: "-20px" }}
+      transition={{ duration: 0.4, delay: index * 0.06, ease: [0.16, 1, 0.3, 1] }}
+      onClick={() => {
+        setFlipped((v) => {
+          const next = !v;
+          if (next) onFlip(index);
+          return next;
+        });
+      }}
+      style={{ height: h, cursor: "pointer", perspective: 900 }}
+    >
+      <motion.div
+        animate={{ rotateY: flipped ? 180 : 0 }}
+        transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+        style={{ position: "relative", width: "100%", height: "100%", transformStyle: "preserve-3d" }}
+      >
+        {/* Front */}
+        <div
+          style={{
+            position: "absolute", inset: 0, backfaceVisibility: "hidden",
+            borderRadius: 14, border: `1px solid ${fact.color}40`, backgroundColor: `${fact.color}14`,
+            display: "flex", flexDirection: "column", justifyContent: "space-between",
+            padding: m ? "12px 12px" : "14px 16px",
+          }}
+        >
+          <span style={{ fontSize: m ? 18 : 20 }}>{fact.emoji}</span>
+          <div>
+            <p className="font-caslon not-italic" style={{ fontSize: m ? 14 : 16, color: "#212012", fontWeight: 600, lineHeight: 1.15 }}>{fact.front}</p>
+            <p className="font-inclusive-sans" style={{ fontSize: 9, color: "#625e37", opacity: 0.5, marginTop: 4, letterSpacing: "0.3px" }}>tap to flip</p>
+          </div>
+        </div>
+        {/* Back */}
+        <div
+          style={{
+            position: "absolute", inset: 0, backfaceVisibility: "hidden", transform: "rotateY(180deg)",
+            borderRadius: 14, backgroundColor: fact.color,
+            display: "flex", alignItems: "center",
+            padding: m ? "12px" : "14px 16px",
+          }}
+        >
+          <p className={fact.color === "#212012" ? "font-inclusive-sans" : "font-inclusive-sans font-medium"} style={{ fontSize: m ? 11 : 12, lineHeight: m ? "16px" : "17px", color: fact.color === "#212012" ? "#e3d9ce" : "#212012" }}>
+            {fact.back}
+          </p>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+// ── ExperienceCard — 3D flip instead of accordion ───────────────────────────
 
 function ExperienceCard({ exp, index, isMobile }: { exp: typeof EXPERIENCE[0]; index: number; isMobile: boolean }) {
-  const [expanded, setExpanded] = useState(index === 0);
+  const [flipped, setFlipped] = useState(false);
   const m = isMobile;
+  const h = m ? 250 : 240;
 
   return (
     <motion.div
@@ -64,79 +171,132 @@ function ExperienceCard({ exp, index, isMobile }: { exp: typeof EXPERIENCE[0]; i
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-20px" }}
       transition={{ duration: 0.4, delay: index * 0.07, ease: [0.16, 1, 0.3, 1] }}
-      style={{ borderRadius: m ? 12 : 16, overflow: "hidden", border: "1px solid rgba(33,32,18,0.09)" }}
+      style={{ height: h, perspective: 1200 }}
     >
-      <button
-        onClick={() => setExpanded((v) => !v)}
+      <motion.div
+        animate={{ rotateY: flipped ? 180 : 0 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        style={{ position: "relative", width: "100%", height: "100%", transformStyle: "preserve-3d" }}
+      >
+        {/* Front */}
+        <button
+          onClick={() => setFlipped(true)}
+          style={{
+            position: "absolute", inset: 0, backfaceVisibility: "hidden",
+            width: "100%", height: "100%", background: "none", cursor: "pointer", textAlign: "left",
+            borderRadius: m ? 12 : 16, border: "1px solid rgba(33,32,18,0.09)",
+            backgroundColor: "rgba(33,32,18,0.02)",
+            padding: m ? "16px 16px" : "20px 22px",
+            display: "flex", flexDirection: "column", justifyContent: "space-between",
+          }}
+        >
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
+              <span
+                style={{ fontSize: 9, letterSpacing: "0.5px", textTransform: "uppercase", backgroundColor: exp.color, color: "#212012", borderRadius: 20, padding: "2px 8px" }}
+                className="font-inclusive-sans font-semibold"
+              >
+                {exp.tag}
+              </span>
+              <p className="font-inclusive-sans" style={{ fontSize: 11, color: "#625e37", opacity: 0.6 }}>{exp.period}</p>
+            </div>
+            <p className="font-caslon not-italic" style={{ fontSize: m ? 18 : 22, lineHeight: m ? "23px" : "27px", color: "#212012", fontWeight: 600 }}>
+              {exp.role}
+            </p>
+            <p className="font-inclusive-sans font-medium" style={{ fontSize: m ? 11 : 12, color: "#625e37", marginTop: 2 }}>
+              {exp.company} · {exp.location}
+            </p>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, alignSelf: "flex-end" }}>
+            <p className="font-inclusive-sans font-medium" style={{ fontSize: 10, color: exp.color, letterSpacing: "0.3px" }}>flip for details</p>
+            <span
+              style={{ width: 22, height: 22, borderRadius: "50%", backgroundColor: `${exp.color}30`, display: "flex", alignItems: "center", justifyContent: "center" }}
+              className="font-caslon"
+            >
+              <span style={{ fontSize: 13, color: "#212012" }}>↻</span>
+            </span>
+          </div>
+        </button>
+
+        {/* Back */}
+        <div
+          style={{
+            position: "absolute", inset: 0, backfaceVisibility: "hidden", transform: "rotateY(180deg)",
+            borderRadius: m ? 12 : 16, border: `1px solid ${exp.color}50`,
+            backgroundColor: `${exp.color}16`,
+            padding: m ? "14px 16px" : "16px 20px",
+            display: "flex", flexDirection: "column",
+          }}
+        >
+          <button
+            onClick={() => setFlipped(false)}
+            style={{ position: "absolute", top: 10, right: 10, background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, borderRadius: "50%", backgroundColor: "rgba(255,255,255,0.4)" }}
+          >
+            <RotateCcw size={12} color="#212012" />
+          </button>
+          <div style={{ flex: 1, overflowY: "auto", paddingRight: 4 }}>
+            <ul style={{ display: "flex", flexDirection: "column", gap: m ? 7 : 8, listStyle: "none", padding: 0, margin: 0 }}>
+              {exp.bullets.map((b, i) => (
+                <li key={i} style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+                  <span style={{ width: 4, height: 4, borderRadius: "50%", backgroundColor: exp.color, flexShrink: 0, marginTop: 6 }} />
+                  <p className="font-inclusive-sans" style={{ fontSize: m ? 11 : 12, lineHeight: m ? "16px" : "18px", color: "#212012", opacity: 0.85 }}>{b}</p>
+                </li>
+              ))}
+            </ul>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 10 }}>
+              {exp.skills.map((s) => (
+                <span key={s} style={{ fontSize: 9, color: "#212012", backgroundColor: "rgba(255,255,255,0.5)", padding: "2px 8px", borderRadius: 20 }} className="font-inclusive-sans font-medium">
+                  {s}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+// ── Tilting avatar ───────────────────────────────────────────────────────────
+
+function TiltAvatar({ size }: { size: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [tilt, setTilt] = useState({ rx: 0, ry: 0 });
+
+  const onMove = useCallback((e: React.MouseEvent) => {
+    const el = ref.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width - 0.5;
+    const py = (e.clientY - r.top) / r.height - 0.5;
+    setTilt({ rx: py * -22, ry: px * 22 });
+  }, []);
+
+  return (
+    <div style={{ perspective: 500 }}>
+      <div
+        ref={ref}
+        onMouseMove={onMove}
+        onMouseLeave={() => setTilt({ rx: 0, ry: 0 })}
         style={{
-          width: "100%", background: "none", border: "none", cursor: "pointer",
-          padding: m ? "14px 16px" : "18px 20px", textAlign: "left",
-          backgroundColor: expanded ? `${exp.color}18` : "rgba(33,32,18,0.02)",
-          transition: "background 0.2s",
-          display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12,
+          width: size, height: size, borderRadius: "50%", flexShrink: 0,
+          backgroundColor: "#c3be6f",
+          border: "3px solid rgba(255,255,255,0.7)", boxShadow: "0 10px 26px rgba(33,32,18,0.22)",
+          transform: `rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg)`,
+          transition: "transform 0.25s cubic-bezier(0.16,1,0.3,1)",
+          transformStyle: "preserve-3d", position: "relative", overflow: "hidden",
         }}
       >
-        <div style={{ flex: 1 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6, flexWrap: "wrap" }}>
-            <span
-              style={{
-                fontSize: 9, letterSpacing: "0.5px", textTransform: "uppercase",
-                backgroundColor: exp.color, color: "#212012", borderRadius: 20, padding: "2px 8px",
-              }}
-              className="font-jakarta font-semibold"
-            >
-              {exp.tag}
-            </span>
-            <p className="font-jakarta" style={{ fontSize: 11, color: "#625e37", opacity: 0.6 }}>{exp.period}</p>
-          </div>
-          <p className="font-caslon not-italic" style={{ fontSize: m ? 16 : 20, lineHeight: m ? "21px" : "25px", color: "#212012", fontWeight: 600 }}>
-            {exp.role}
-          </p>
-          <p className="font-jakarta font-medium" style={{ fontSize: m ? 11 : 12, color: "#625e37", marginTop: 2 }}>
-            {exp.company} · {exp.location}
-          </p>
-        </div>
-        <motion.span
-          animate={{ rotate: expanded ? 45 : 0 }}
-          transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-          className="font-caslon"
-          style={{ fontSize: 22, color: "rgba(33,32,18,0.3)", flexShrink: 0, lineHeight: 1, marginTop: 2 }}
-        >
-          +
-        </motion.span>
-      </button>
-
-      <AnimatePresence initial={false}>
-        {expanded && (
-          <motion.div
-            initial={{ height: 0 }}
-            animate={{ height: "auto" }}
-            exit={{ height: 0 }}
-            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-            style={{ overflow: "hidden" }}
-          >
-            <div style={{ padding: m ? "4px 16px 16px" : "4px 20px 20px" }}>
-              <div style={{ height: 1, backgroundColor: "rgba(33,32,18,0.07)", marginBottom: 14 }} />
-              <ul style={{ display: "flex", flexDirection: "column", gap: m ? 8 : 10, listStyle: "none", padding: 0, margin: 0 }}>
-                {exp.bullets.map((b, i) => (
-                  <li key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                    <span style={{ width: 5, height: 5, borderRadius: "50%", backgroundColor: exp.color, flexShrink: 0, marginTop: 6 }} />
-                    <p className="font-jakarta" style={{ fontSize: m ? 12 : 13, lineHeight: m ? "18px" : "20px", color: "#212012", opacity: 0.8 }}>{b}</p>
-                  </li>
-                ))}
-              </ul>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 14 }}>
-                {exp.skills.map((s) => (
-                  <span key={s} style={{ fontSize: 10, color: "#625e37", backgroundColor: "rgba(98,94,55,0.1)", padding: "3px 10px", borderRadius: 20 }} className="font-jakarta font-medium">
-                    {s}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
+        <img src={myPhoto} alt="Laxmi Mahajan" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+        {/* glare */}
+        <div
+          style={{
+            position: "absolute", inset: 0, borderRadius: "50%", pointerEvents: "none",
+            background: `radial-gradient(circle at ${50 + tilt.ry * 1.4}% ${50 - tilt.rx * 1.4}%, rgba(255,255,255,0.55), transparent 55%)`,
+          }}
+        />
+      </div>
+    </div>
   );
 }
 
@@ -147,22 +307,82 @@ interface AboutMeDrawerProps {
   onClose: () => void;
 }
 
+const STATS = [
+  { target: 3, suffix: "+", label: "years" },
+  { target: 100, suffix: "+", label: "flows shipped" },
+  { target: 10, suffix: "M+", label: "users reached" },
+];
+
 export function AboutMeDrawer({ open, onClose }: AboutMeDrawerProps) {
   const isMobile = useIsMobile(768);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [scrolled, setScrolled] = useState(false);
+  const aboutLabelRef = useRef<HTMLParagraphElement>(null);
+  const expLabelRef = useRef<HTMLParagraphElement>(null);
+  const statRefs = useRef<Array<HTMLParagraphElement | null>>([]);
+  const flippedFacts = useRef<Set<number>>(new Set());
+  const celebrated = useRef(false);
+
+  const m = isMobile;
+
+  const handleFactFlip = useCallback((i: number) => {
+    flippedFacts.current.add(i);
+    if (flippedFacts.current.size === FACTS.length && !celebrated.current) {
+      celebrated.current = true;
+      confetti({ particleCount: 70, spread: 65, startVelocity: 32, gravity: 1.1, colors: PALETTE, origin: { x: 0.85, y: 0.3 }, scalar: 0.8 });
+    }
+  }, []);
 
   useEffect(() => {
-    if (open && scrollRef.current) {
+    if (!open) return;
+    if (scrollRef.current) {
       scrollRef.current.scrollTop = 0;
       setScrolled(false);
     }
+    flippedFacts.current = new Set();
+    celebrated.current = false;
+
+    // count-up stats
+    statRefs.current.forEach((el, i) => {
+      if (!el) return;
+      const stat = STATS[i];
+      const counter = { val: 0 };
+      gsap.to(counter, {
+        val: stat.target, duration: 1.1, delay: 0.15 + i * 0.12, ease: "power2.out",
+        onUpdate: () => { el.textContent = `${Math.round(counter.val)}${stat.suffix}`; },
+      });
+    });
   }, [open]);
 
-  const m = isMobile;
-  const drawerWidth = m ? "100%" : 560;
+  // GSAP scroll-velocity skew on section eyebrow labels (Codrops-style)
+  useEffect(() => {
+    if (!open) return;
+    const container = scrollRef.current;
+    if (!container) return;
+
+    const skewAbout = gsap.quickTo(aboutLabelRef.current, "skewX", { duration: 0.5, ease: "power3.out" });
+    const skewExp = gsap.quickTo(expLabelRef.current, "skewX", { duration: 0.5, ease: "power3.out" });
+    let lastTop = container.scrollTop;
+    let raf = 0;
+
+    const onScroll = () => {
+      setScrolled(container.scrollTop > 20);
+      const delta = container.scrollTop - lastTop;
+      lastTop = container.scrollTop;
+      const skew = Math.max(-14, Math.min(14, delta * -0.9));
+      skewAbout(skew);
+      skewExp(skew);
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => { skewAbout(0); skewExp(0); });
+    };
+
+    container.addEventListener("scroll", onScroll, { passive: true });
+    return () => { container.removeEventListener("scroll", onScroll); cancelAnimationFrame(raf); };
+  }, [open]);
+
+  const drawerWidth = m ? "100%" : 880;
   const drawerBorderRadius = m ? 0 : "24px 0 0 24px";
-  const contentPad = m ? 16 : 30;
+  const contentPad = m ? 16 : 44;
 
   return (
     <AnimatePresence>
@@ -182,9 +402,9 @@ export function AboutMeDrawer({ open, onClose }: AboutMeDrawerProps) {
           {/* Drawer */}
           <motion.div
             key="about-drawer"
-            initial={{ x: m ? "100%" : 600 }}
+            initial={{ x: m ? "100%" : 880 }}
             animate={{ x: 0 }}
-            exit={{ x: m ? "100%" : 600 }}
+            exit={{ x: m ? "100%" : 880 }}
             transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
             style={{
               position: "fixed", right: 0, top: 0, bottom: 0,
@@ -199,7 +419,6 @@ export function AboutMeDrawer({ open, onClose }: AboutMeDrawerProps) {
             {/* Scrollable content */}
             <div
               ref={scrollRef}
-              onScroll={(e) => setScrolled((e.target as HTMLDivElement).scrollTop > 20)}
               style={{ flex: 1, overflowY: "auto", scrollbarWidth: "none" }}
             >
               {/* Sticky top bar */}
@@ -228,7 +447,7 @@ export function AboutMeDrawer({ open, onClose }: AboutMeDrawerProps) {
                       <motion.p
                         initial={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="font-jakarta font-medium"
+                        className="font-inclusive-sans font-medium"
                         style={{ fontSize: m ? 11 : 12, color: "#625e37", marginTop: 4, letterSpacing: "0.3px" }}
                       >
                         Product Designer · Bangalore
@@ -275,20 +494,14 @@ export function AboutMeDrawer({ open, onClose }: AboutMeDrawerProps) {
               <div style={{ padding: `${m ? 16 : 24}px ${contentPad}px 0` }}>
 
                 {/* Avatar + quick stats row */}
-                <div style={{ display: "flex", gap: m ? 14 : 20, alignItems: "flex-start", marginBottom: m ? 20 : 28 }}>
-                  <div style={{ width: m ? 60 : 72, height: m ? 60 : 72, borderRadius: "50%", backgroundColor: "#c3be6f", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", border: "3px solid rgba(255,255,255,0.7)" }}>
-                    <p className="font-caslon" style={{ fontSize: m ? 22 : 28, color: "#212012", fontWeight: 600, fontStyle: "italic" }}>L</p>
-                  </div>
+                <div style={{ display: "flex", gap: m ? 14 : 20, alignItems: "flex-start", marginBottom: m ? 22 : 30 }}>
+                  <TiltAvatar size={m ? 60 : 76} />
                   <div style={{ flex: 1 }}>
                     <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                      {[
-                        { val: "3+", label: "years" },
-                        { val: "100+", label: "flows shipped" },
-                        { val: "10M+", label: "users reached" },
-                      ].map((stat) => (
+                      {STATS.map((stat, i) => (
                         <div key={stat.label} style={{ backgroundColor: "rgba(33,32,18,0.05)", borderRadius: 10, padding: m ? "6px 10px" : "8px 14px", flex: 1, minWidth: 60 }}>
-                          <p className="font-caslon not-italic" style={{ fontSize: m ? 16 : 20, color: "#212012", fontWeight: 600, lineHeight: m ? "20px" : "24px" }}>{stat.val}</p>
-                          <p className="font-jakarta" style={{ fontSize: 10, color: "#625e37", opacity: 0.65 }}>{stat.label}</p>
+                          <p ref={(el) => { statRefs.current[i] = el; }} className="font-caslon not-italic" style={{ fontSize: m ? 16 : 20, color: "#212012", fontWeight: 600, lineHeight: m ? "20px" : "24px" }}>0{stat.suffix}</p>
+                          <p className="font-inclusive-sans" style={{ fontSize: 10, color: "#625e37", opacity: 0.65 }}>{stat.label}</p>
                         </div>
                       ))}
                     </div>
@@ -298,25 +511,38 @@ export function AboutMeDrawer({ open, onClose }: AboutMeDrawerProps) {
                         transition={{ duration: 1.7, repeat: Infinity, ease: "easeInOut" }}
                         style={{ width: 6, height: 6, borderRadius: "50%", backgroundColor: "#c3be6f", display: "inline-block", flexShrink: 0 }}
                       />
-                      <p className="font-jakarta font-medium" style={{ fontSize: 11, color: "#625e37", letterSpacing: "0.4px", textTransform: "uppercase" }}>open to work</p>
+                      <p className="font-inclusive-sans font-medium" style={{ fontSize: 11, color: "#625e37", letterSpacing: "0.4px", textTransform: "uppercase" }}>open to work</p>
                     </div>
                   </div>
                 </div>
 
-                {/* About me copy */}
+                {/* Scrapbook — real, tilted, taped-down photos instead of stock imagery */}
+                <div style={{ display: "flex", gap: m ? 10 : 4, marginBottom: m ? 24 : 34, overflowX: m ? "auto" : "visible", paddingBottom: 4 }}>
+                  {SCRAPBOOK.map((p, i) => (
+                    <motion.div
+                      key={p.caption}
+                      initial={{ opacity: 0, y: 16, scale: 0.9 }}
+                      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                      viewport={{ once: true, margin: "-20px" }}
+                      transition={{ duration: 0.4, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
+                      style={{ flexShrink: 0, marginLeft: !m && i > 0 ? -14 : 0, zIndex: i, position: "relative" }}
+                    >
+                      <Polaroid src={p.src} caption={p.caption} rotate={p.rot} width={m ? 100 : 128} />
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* Fun facts — flip cards instead of paragraphs */}
                 <div style={{ marginBottom: m ? 20 : 32 }}>
-                  <p className="font-jakarta font-medium uppercase" style={{ fontSize: 10, letterSpacing: "0.5px", color: "#625e37", opacity: 0.55, marginBottom: 10 }}>
-                    about
+                  <p ref={aboutLabelRef} className="font-inclusive-sans font-medium uppercase" style={{ fontSize: 10, letterSpacing: "0.5px", color: "#625e37", opacity: 0.55, marginBottom: 4, display: "inline-block" }}>
+                    about, in four flips
                   </p>
-                  <p className="font-jakarta" style={{ fontSize: m ? 13 : 15, lineHeight: m ? "21px" : "25px", color: "#212012", opacity: 0.85, marginBottom: 14 }}>
-                    I'm a product designer based in Bangalore with three years of shipping real product at scale. Most of that time was at Canvs Club — designing for ICICI Bank's digital ecosystem across five platforms, 100+ flows, and millions of users.
-                  </p>
-                  <p className="font-jakarta" style={{ fontSize: m ? 13 : 15, lineHeight: m ? "21px" : "25px", color: "#212012", opacity: 0.85, marginBottom: 14 }}>
-                    I'm drawn to problems with real stakes, the kind where clarity of thought and care in execution actually change how people experience something important. Banking, healthcare, fintech. I like working in the messy middle where product, design, and engineering blur into one thing.
-                  </p>
-                  <p className="font-jakarta" style={{ fontSize: m ? 13 : 15, lineHeight: m ? "21px" : "25px", color: "#212012", opacity: 0.85 }}>
-                    Outside of work I write, sketch, and experiment with AI — trying to understand what it can do before everyone else figures it out. Currently looking for a startup worth getting obsessed over.
-                  </p>
+                  <p className="font-inclusive-sans" style={{ fontSize: 11, color: "#625e37", opacity: 0.45, marginBottom: 12 }}>tap a card — flip them all for a surprise</p>
+                  <div style={{ display: "grid", gridTemplateColumns: m ? "1fr 1fr" : "repeat(4, 1fr)", gap: m ? 8 : 12 }}>
+                    {FACTS.map((fact, i) => (
+                      <FactCard key={fact.front} fact={fact} index={i} isMobile={m} onFlip={handleFactFlip} />
+                    ))}
+                  </div>
                 </div>
 
                 {/* Links row */}
@@ -340,7 +566,7 @@ export function AboutMeDrawer({ open, onClose }: AboutMeDrawerProps) {
                         border: "1px solid rgba(33,32,18,0.08)",
                       }}
                     >
-                      <p className="font-jakarta font-medium" style={{ fontSize: m ? 11 : 12, color: "#212012" }}>{link.label}</p>
+                      <p className="font-inclusive-sans font-medium" style={{ fontSize: m ? 11 : 12, color: "#212012" }}>{link.label}</p>
                       <ExternalLink size={10} color="rgba(33,32,18,0.4)" />
                     </motion.a>
                   ))}
@@ -350,12 +576,15 @@ export function AboutMeDrawer({ open, onClose }: AboutMeDrawerProps) {
                 <div style={{ height: 1, backgroundColor: "rgba(33,32,18,0.09)", marginBottom: m ? 20 : 28 }} />
 
                 {/* Experience */}
-                <p className="font-jakarta font-medium uppercase" style={{ fontSize: 10, letterSpacing: "0.5px", color: "#625e37", opacity: 0.55, marginBottom: m ? 12 : 16 }}>
+                <p ref={expLabelRef} className="font-inclusive-sans font-medium uppercase" style={{ fontSize: 10, letterSpacing: "0.5px", color: "#625e37", opacity: 0.55, marginBottom: 4, display: "inline-block" }}>
                   work experience
                 </p>
-                <div style={{ display: "flex", flexDirection: "column", gap: 8, paddingBottom: m ? 80 : 60 }}>
+                <p className="font-inclusive-sans" style={{ fontSize: 11, color: "#625e37", opacity: 0.45, marginBottom: m ? 12 : 16 }}>flip a card to see the details</p>
+                <div style={{ display: "grid", gridTemplateColumns: m ? "1fr" : "1fr 1fr", gap: 12, paddingBottom: m ? 80 : 60 }}>
                   {EXPERIENCE.map((exp, i) => (
-                    <ExperienceCard key={exp.company} exp={exp} index={i} isMobile={m} />
+                    <div key={exp.company} style={{ gridColumn: !m && i === 0 ? "1 / -1" : undefined }}>
+                      <ExperienceCard exp={exp} index={i} isMobile={m} />
+                    </div>
                   ))}
                 </div>
               </div>

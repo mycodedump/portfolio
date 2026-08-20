@@ -44,15 +44,15 @@ function BlogListItem({ post, isNewest, onClick }: { post: BlogPost; isNewest: b
         <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
           {isNewest && (
             <span style={{ backgroundColor: "#dda1ae", borderRadius: 20, padding: "2px 8px" }}>
-              <p className="font-jakarta font-semibold" style={{ fontSize: 9, color: "#212012", letterSpacing: "0.5px", textTransform: "uppercase" }}>new</p>
+              <p className="font-inclusive-sans font-semibold" style={{ fontSize: 9, color: "#212012", letterSpacing: "0.5px", textTransform: "uppercase" }}>new</p>
             </span>
           )}
           <span style={{ backgroundColor: "rgba(98,94,55,0.1)", borderRadius: 20, padding: "2px 10px" }}>
-            <p className="font-jakarta font-medium" style={{ fontSize: 10, color: "#625e37", letterSpacing: "0.3px", textTransform: "uppercase" }}>{post.category}</p>
+            <p className="font-inclusive-sans font-medium" style={{ fontSize: 10, color: "#625e37", letterSpacing: "0.3px", textTransform: "uppercase" }}>{post.category}</p>
           </span>
-          <p className="font-jakarta" style={{ fontSize: 12, color: "#625e37", opacity: 0.55 }}>{post.date}</p>
+          <p className="font-inclusive-sans" style={{ fontSize: 12, color: "#625e37", opacity: 0.55 }}>{post.date}</p>
           <span style={{ color: "rgba(98,94,55,0.3)", fontSize: 10 }}>·</span>
-          <p className="font-jakarta" style={{ fontSize: 12, color: "#625e37", opacity: 0.45 }}>{post.readTime}</p>
+          <p className="font-inclusive-sans" style={{ fontSize: 12, color: "#625e37", opacity: 0.45 }}>{post.readTime}</p>
         </div>
         <p
           className="font-caslon not-italic"
@@ -60,7 +60,7 @@ function BlogListItem({ post, isNewest, onClick }: { post: BlogPost; isNewest: b
         >
           {withMartel(post.title)}
         </p>
-        <p className="font-jakarta" style={{ fontSize: 14, lineHeight: "20px", color: "#625e37", opacity: 0.75 }}>
+        <p className="font-inclusive-sans" style={{ fontSize: 14, lineHeight: "20px", color: "#625e37", opacity: 0.75 }}>
           {post.subtitle}
         </p>
       </div>
@@ -139,7 +139,7 @@ export function TinkeringSection() {
 
       <div style={{ padding: isMobile ? "28px 16px 60px" : "40px 40px 80px" }}>
         <div style={{ marginBottom: 28 }}>
-          <p className="font-jakarta font-medium uppercase" style={{ fontSize: 12, letterSpacing: "0.48px", color: "#625e37", marginBottom: 8 }}>
+          <p className="font-inclusive-sans font-medium uppercase" style={{ fontSize: 12, letterSpacing: "0.48px", color: "#625e37", marginBottom: 8 }}>
             i write, sometimes
           </p>
           <p className="font-caslon not-italic" style={{ fontSize: 36, lineHeight: "44px", color: "#212012", fontWeight: 600 }}>
@@ -161,7 +161,7 @@ export function TinkeringSection() {
             marginBottom: 8,
           }}
         >
-          <p className="font-jakarta font-medium" style={{ fontSize: 11, color: "rgba(160,96,112,0.6)", letterSpacing: "0.4px", textTransform: "uppercase", flexShrink: 0, marginRight: 4 }}>
+          <p className="font-inclusive-sans font-medium" style={{ fontSize: 11, color: "rgba(160,96,112,0.6)", letterSpacing: "0.4px", textTransform: "uppercase", flexShrink: 0, marginRight: 4 }}>
             filter
           </p>
           {CHIPS.map((chip) => (
@@ -175,7 +175,7 @@ export function TinkeringSection() {
                 transition: "background 0.15s, border-color 0.15s",
               }}
             >
-              <p className="font-jakarta font-medium" style={{ fontSize: 11, color: activeChip === chip ? "#212012" : "#a06070" }}>
+              <p className="font-inclusive-sans font-medium" style={{ fontSize: 11, color: activeChip === chip ? "#212012" : "#a06070" }}>
                 {chip}
               </p>
             </button>
@@ -189,14 +189,14 @@ export function TinkeringSection() {
                 onClick={() => setActiveChip(null)}
                 style={{ background: "none", border: "none", cursor: "pointer", padding: "5px 4px" }}
               >
-                <p className="font-jakarta" style={{ fontSize: 11, color: "rgba(160,96,112,0.5)" }}>clear ×</p>
+                <p className="font-inclusive-sans" style={{ fontSize: 11, color: "rgba(160,96,112,0.5)" }}>clear ×</p>
               </motion.button>
             )}
           </AnimatePresence>
         </div>
 
         {BLOG_POSTS.length > 0 && (
-          <p className="font-jakarta" style={{ fontSize: 12, color: "#625e37", opacity: 0.4, marginBottom: 4 }}>
+          <p className="font-inclusive-sans" style={{ fontSize: 12, color: "#625e37", opacity: 0.4, marginBottom: 4 }}>
             {filtered.length} essay{filtered.length !== 1 ? "s" : ""}{activeChip ? ` in "${activeChip}"` : " · opinions on design, systems, and fintech"}
           </p>
         )}
@@ -212,7 +212,7 @@ export function TinkeringSection() {
             <p className="font-caslon not-italic" style={{ fontSize: 28, color: "#212012", fontWeight: 600, marginBottom: 8, lineHeight: "36px" }}>
               <em>working on something worth reading</em>
             </p>
-            <p className="font-jakarta" style={{ fontSize: 13, color: "#625e37", opacity: 0.6, lineHeight: "20px" }}>
+            <p className="font-inclusive-sans" style={{ fontSize: 13, color: "#625e37", opacity: 0.6, lineHeight: "20px" }}>
               check back soon - the drafts are living their best life in my notes app
             </p>
             <motion.div

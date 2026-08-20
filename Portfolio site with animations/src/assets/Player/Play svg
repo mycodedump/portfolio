@@ -1,0 +1,17 @@
+/* PlayCircle */
+
+position: relative;
+width: 24px;
+height: 24px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 9.38%;
+right: 9.37%;
+top: 9.38%;
+bottom: 9.37%;
+
+background: #C67D39;

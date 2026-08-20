@@ -78,7 +78,7 @@ export function MobileBottomNav({
               border: "none",
               padding: 0,
               cursor: "pointer",
-              fontFamily: "'Plus Jakarta Sans', sans-serif",
+              fontFamily: "'Inclusive Sans', sans-serif",
               fontWeight: 500,
               fontSize: 10,
               letterSpacing: "0.4px",

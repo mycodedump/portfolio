@@ -3,6 +3,8 @@ import { motion, useTransform, AnimatePresence } from "motion/react";
 import { useScrollProgress } from "../ScrollContext";
 import { MobileHeader } from "./MobileHeader";
 import { useIsMobile } from "../useIsMobile";
+import { Polaroid } from "./Polaroid";
+import myPhoto from "../../assets/my-photo.jpg";
 
 function LiveClock() {
   const [time, setTime] = useState("");
@@ -19,7 +21,7 @@ function LiveClock() {
     return () => clearInterval(id);
   }, []);
   return (
-    <p className="font-jakarta font-semibold text-[#212012] uppercase" style={{ fontSize: 12, letterSpacing: "0.48px" }}>
+    <p className="font-inclusive-sans font-semibold text-[#212012] uppercase" style={{ fontSize: 12, letterSpacing: "0.48px" }}>
       {time}
     </p>
   );
@@ -87,7 +89,7 @@ function Annotation({
           minWidth: small ? 72 : 96,
         }}
       >
-        <p className="font-jakarta font-medium uppercase" style={{ fontSize: small ? 7 : 9, letterSpacing: "0.55px", color: "rgba(33,32,18,0.42)", marginBottom: 2 }}>{label}</p>
+        <p className="font-inclusive-sans font-medium uppercase" style={{ fontSize: small ? 7 : 9, letterSpacing: "0.55px", color: "rgba(33,32,18,0.42)", marginBottom: 2 }}>{label}</p>
         <p className="font-caslon not-italic" style={{ fontSize: small ? 13 : 18, color: "#212012", fontWeight: 600, lineHeight: small ? "17px" : "22px", whiteSpace: "nowrap" }}>{value}</p>
       </motion.div>
       <svg style={{ position: "absolute", top: "100%", left: "50%", transform: "translateX(-50%)", overflow: "visible", opacity: 0.22 }} width={2} height={18}>
@@ -144,6 +146,19 @@ export function HeroSection() {
         </>
       )}
 
+      {/* Taped-in "that's me" polaroid — a real photo among the typographic annotations */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8, y: 14, rotate: -13 }}
+        animate={{ opacity: 1, scale: 1, y: 0, rotate: -8 }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 1.5 }}
+        style={{ position: "absolute", left: isMobile ? "5%" : "3%", top: "42%", zIndex: 5, pointerEvents: "auto" }}
+      >
+        <motion.div animate={{ y: [0, -9, 0] }} transition={{ duration: 3.6, repeat: Infinity, ease: "easeInOut", delay: 0.6 }}>
+          <Polaroid src={myPhoto} caption="hi, that's me" width={isMobile ? 84 : 118} rotate={0} tapeRotate={6} />
+        </motion.div>
+      </motion.div>
+
+
       <motion.div style={{ display: "flex", flexDirection: "column", height: "100%", opacity, y: contentY }}>
         {isMobile ? (
           <motion.div
@@ -161,7 +176,7 @@ export function HeroSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.05 }}
           >
-            <p className="font-jakarta font-semibold text-[#212012] uppercase" style={{ fontSize: 12, letterSpacing: "0.48px" }}>
+            <p className="font-inclusive-sans font-semibold text-[#212012] uppercase" style={{ fontSize: 12, letterSpacing: "0.48px" }}>
               based in bangalore
             </p>
             <LiveClock />
@@ -198,7 +213,7 @@ export function HeroSection() {
                 transition={{ duration: 1.7, repeat: Infinity, ease: "easeInOut" }}
                 style={{ width: 6, height: 6, borderRadius: "50%", backgroundColor: "#c3be6f", display: "inline-block" }}
               />
-              <p className="font-jakarta font-medium" style={{ fontSize: 12, color: "#625e37", letterSpacing: "0.4px", textTransform: "uppercase" }}>
+              <p className="font-inclusive-sans font-medium" style={{ fontSize: 12, color: "#625e37", letterSpacing: "0.4px", textTransform: "uppercase" }}>
                 open to work
               </p>
             </motion.div>

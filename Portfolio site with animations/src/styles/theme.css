@@ -123,6 +123,10 @@
 .font-caslon {
   font-family: 'Libre Caslon Condensed', serif;
 }
+.font-inclusive-sans {
+  font-family: 'Inclusive Sans', sans-serif;
+  font-optical-sizing: auto;
+}
 .font-jakarta {
   font-family: 'Plus Jakarta Sans', sans-serif;
 }

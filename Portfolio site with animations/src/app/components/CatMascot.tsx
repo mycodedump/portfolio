@@ -102,7 +102,7 @@ function Bubble({ text, color = "#e3d9ce" }: { text: string; color?: string }) {
       style={{
         position: "absolute", bottom: "100%", left: "50%", transform: "translateX(-50%)",
         background: color, borderRadius: 10, padding: "6px 12px", marginBottom: 6,
-        fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 12, fontWeight: 600,
+        fontFamily: "'Inclusive Sans', sans-serif", fontSize: 12, fontWeight: 600,
         color: "#212012", whiteSpace: "nowrap",
         boxShadow: "0 2px 12px rgba(33,32,18,0.15)",
         border: "1.5px solid rgba(255,255,255,0.6)",
@@ -169,7 +169,7 @@ function FeedButton({ onFeed }: { onFeed: () => void }) {
       style={{
         position: "absolute", bottom: "calc(100% + 8px)", left: "50%", transform: "translateX(-50%)",
         background: "#c67d39", color: "#212012", border: "none", cursor: "pointer",
-        padding: "5px 11px", borderRadius: 8, fontSize: 10, fontFamily: "'Plus Jakarta Sans', sans-serif",
+        padding: "5px 11px", borderRadius: 8, fontSize: 10, fontFamily: "'Inclusive Sans', sans-serif",
         fontWeight: 700, letterSpacing: "0.4px", textTransform: "uppercase", whiteSpace: "nowrap",
         boxShadow: "0 2px 8px rgba(198,125,57,0.3)",
       }}

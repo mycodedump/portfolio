@@ -218,7 +218,7 @@ export default function App() {
           background: "rgba(33,32,18,0.08)", backdropFilter: "blur(8px)",
           border: "1px solid rgba(33,32,18,0.1)", borderRadius: 10,
           padding: "7px 12px", cursor: "pointer",
-          fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 10,
+          fontFamily: "'Inclusive Sans', sans-serif", fontSize: 10,
           fontWeight: 600, letterSpacing: "0.4px", textTransform: "uppercase",
           color: "#625e37",
         }}

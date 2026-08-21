@@ -4,6 +4,7 @@ import { X, Play, Pause } from "lucide-react";
 import { BLOG_POSTS, type BlogPost } from "./BlogDetail";
 import { useAudioPlayer } from "@/app/useAudioPlayer";
 import { useWordTimings, type WordTiming } from "@/app/useWordTimings";
+import { useIsMobile } from "@/app/useIsMobile";
 
 const MARTEL = { fontFamily: "'Martel', serif", fontWeight: 600 };
 
@@ -77,7 +78,7 @@ function BlogAudioPlayer({ slug, currentTimeRef }: { slug: string; currentTimeRe
       >
         <div style={{ width: `${progress * 100}%`, height: "100%", backgroundColor: "#c3be6f", borderRadius: 1 }} />
       </div>
-      <p className="font-jakarta" style={{ fontSize: 11, color: "#625e37", opacity: 0.6, letterSpacing: "0.1px", flexShrink: 0 }}>
+      <p className="font-inclusive-sans" style={{ fontSize: 11, color: "#625e37", opacity: 0.6, letterSpacing: "0.1px", flexShrink: 0 }}>
         {available ? timeLabel : "narration coming soon"}
       </p>
     </div>
@@ -109,7 +110,7 @@ function RelatedBlogLink({ post, isLast, onClick }: { post: BlogPost; isLast: bo
     >
       <div>
         <span style={{ backgroundColor: "rgba(98,94,55,0.1)", borderRadius: 20, padding: "2px 10px", display: "inline-block", marginBottom: 6 }}>
-          <p className="font-jakarta font-medium" style={{ fontSize: 10, color: "#625e37", letterSpacing: "0.3px", textTransform: "uppercase" }}>
+          <p className="font-inclusive-sans font-medium" style={{ fontSize: 10, color: "#625e37", letterSpacing: "0.3px", textTransform: "uppercase" }}>
             {post.category}
           </p>
         </span>
@@ -119,7 +120,7 @@ function RelatedBlogLink({ post, isLast, onClick }: { post: BlogPost; isLast: bo
         >
           {post.title}
         </p>
-        <p className="font-jakarta" style={{ fontSize: 12, color: "#625e37", opacity: 0.6, marginTop: 2 }}>
+        <p className="font-inclusive-sans" style={{ fontSize: 12, color: "#625e37", opacity: 0.6, marginTop: 2 }}>
           {post.date} · {post.readTime}
         </p>
       </div>
@@ -136,6 +137,7 @@ function RelatedBlogLink({ post, isLast, onClick }: { post: BlogPost; isLast: bo
 }
 
 export function BlogPostDrawer({ post, onClose, onNavigate }: BlogPostDrawerProps) {
+  const isMobile = useIsMobile(768);
   const scrollableRef = useRef<HTMLDivElement>(null);
   const [scrolled, setScrolled] = useState(false);
   const [audioTime, setAudioTime] = useState(0);
@@ -171,13 +173,13 @@ export function BlogPostDrawer({ post, onClose, onNavigate }: BlogPostDrawerProp
           />
           <motion.div
             key="drawer"
-            initial={{ x: 740 }}
+            initial={{ x: isMobile ? "100%" : 880 }}
             animate={{ x: 0 }}
-            exit={{ x: 740 }}
+            exit={{ x: isMobile ? "100%" : 880 }}
             transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
             style={{
-              position: "fixed", right: 0, top: 0, bottom: 0, width: 700, zIndex: 500,
-              borderRadius: "24px 0 0 24px",
+              position: "fixed", right: 0, top: 0, bottom: 0, width: isMobile ? "100%" : 880, zIndex: 500,
+              borderRadius: isMobile ? 0 : "24px 0 0 24px",
               backgroundColor: "#e3d9ce",
               overflow: "hidden",
             }}
@@ -204,20 +206,22 @@ export function BlogPostDrawer({ post, onClose, onNavigate }: BlogPostDrawerProp
                 style={{
                   position: "sticky", top: 0, zIndex: 5,
                   backgroundColor: "#e3d9ce",
-                  padding: scrolled ? "14px 56px 14px 36px" : "36px 56px 20px 36px",
+                  padding: scrolled
+                    ? `14px ${isMobile ? 48 : 56}px 14px ${isMobile ? 16 : 36}px`
+                    : `${isMobile ? 20 : 36}px ${isMobile ? 48 : 56}px 20px ${isMobile ? 16 : 36}px`,
                   borderBottom: scrolled ? "1px solid rgba(33,32,18,0.1)" : "1px solid transparent",
                   transition: "padding 0.3s ease, border-color 0.3s ease",
                 }}
               >
                 <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 8 }}>
                   <span style={{ backgroundColor: "rgba(221,161,174,0.28)", borderRadius: 20, padding: "3px 10px" }}>
-                    <p className="font-jakarta font-medium" style={{ fontSize: 10, color: "#a06070", letterSpacing: "0.3px", textTransform: "uppercase" }}>
+                    <p className="font-inclusive-sans font-medium" style={{ fontSize: 10, color: "#a06070", letterSpacing: "0.3px", textTransform: "uppercase" }}>
                       {post.category}
                     </p>
                   </span>
-                  <p className="font-jakarta" style={{ fontSize: 12, color: "#625e37", opacity: 0.6 }}>{post.date}</p>
+                  <p className="font-inclusive-sans" style={{ fontSize: 12, color: "#625e37", opacity: 0.6 }}>{post.date}</p>
                   <span style={{ color: "rgba(98,94,55,0.3)", fontSize: 10 }}>·</span>
-                  <p className="font-jakarta" style={{ fontSize: 12, color: "#625e37", opacity: 0.5 }}>{post.readTime}</p>
+                  <p className="font-inclusive-sans" style={{ fontSize: 12, color: "#625e37", opacity: 0.5 }}>{post.readTime}</p>
                 </div>
                 <motion.p
                   className="font-caslon not-italic"
@@ -230,8 +234,8 @@ export function BlogPostDrawer({ post, onClose, onNavigate }: BlogPostDrawerProp
               </div>
 
               {/* Body */}
-              <div style={{ padding: "28px 52px 40px 36px" }}>
-                <p className="font-jakarta" style={{ fontSize: 16, lineHeight: "25px", color: "#625e37", opacity: 0.9, marginBottom: 20 }}>
+              <div style={{ padding: isMobile ? "20px 16px 32px" : "28px 52px 40px 36px" }}>
+                <p className="font-inclusive-sans" style={{ fontSize: 16, lineHeight: "25px", color: "#625e37", opacity: 0.9, marginBottom: 20 }}>
                   {post.subtitle}
                 </p>
                 <BlogAudioPlayer slug={post.slug} currentTimeRef={setAudioTime} />
@@ -260,15 +264,15 @@ export function BlogPostDrawer({ post, onClose, onNavigate }: BlogPostDrawerProp
                     <p className="font-caslon" style={{ fontSize: 16, color: "#212012", fontWeight: 600 }}>L</p>
                   </div>
                   <div>
-                    <p className="font-jakarta font-semibold" style={{ fontSize: 14, color: "#212012" }}>Laxmi Mahajan</p>
-                    <p className="font-jakarta" style={{ fontSize: 12, color: "#625e37", opacity: 0.6 }}>UX designer · Bangalore</p>
+                    <p className="font-inclusive-sans font-semibold" style={{ fontSize: 14, color: "#212012" }}>Laxmi Mahajan</p>
+                    <p className="font-inclusive-sans" style={{ fontSize: 12, color: "#625e37", opacity: 0.6 }}>UX designer · Bangalore</p>
                   </div>
                 </div>
               </div>
 
               {/* Related */}
-              <div style={{ padding: "32px 52px 56px 36px", borderTop: "1px solid rgba(33,32,18,0.1)" }}>
-                <p className="font-jakarta font-medium uppercase" style={{ fontSize: 11, letterSpacing: "0.5px", color: "rgba(33,32,18,0.35)", marginBottom: 8 }}>
+              <div style={{ padding: isMobile ? "24px 16px 48px" : "32px 52px 56px 36px", borderTop: "1px solid rgba(33,32,18,0.1)" }}>
+                <p className="font-inclusive-sans font-medium uppercase" style={{ fontSize: 11, letterSpacing: "0.5px", color: "rgba(33,32,18,0.35)", marginBottom: 8 }}>
                   read more
                 </p>
                 {related.map((p, i) => (

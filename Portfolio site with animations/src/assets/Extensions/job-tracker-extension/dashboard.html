@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Job Hunt Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="dashboard.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="header">
+      <div class="brand-row">
+        <img class="mark" src="icons/logo.svg" alt="" />
+        <span class="eyebrow">Job Hunt Tracker</span>
+      </div>
+      <div class="header-main">
+        <div>
+          <h1>Roles you've captured</h1>
+          <p class="sub">
+            Saved from the extension, kept only on this device. Review the
+            requirements, tailor your resume, then mark it applied.
+          </p>
+        </div>
+        <div class="header-actions">
+          <button id="importBtn" class="ghost-btn">Import</button>
+          <button id="exportBtn" class="ghost-btn">Export</button>
+          <input id="importFile" type="file" accept="application/json" hidden />
+        </div>
+      </div>
+    </header>
+
+    <div id="statsBar" class="stats-bar"></div>
+
+    <div id="listView">
+      <div class="controls">
+        <div class="filter-tabs" id="filterTabs">
+          <button class="filter-tab active" data-filter="all">All</button>
+          <button class="filter-tab" data-filter="pending">Not applied</button>
+          <button class="filter-tab" data-filter="applied">Applied</button>
+        </div>
+        <div class="controls-right">
+          <input id="searchInput" type="text" placeholder="Search role, company, keyword…" class="search-input" />
+          <div class="view-toggle" id="viewToggle">
+            <button class="view-btn active" data-view="cards">Cards</button>
+            <button class="view-btn" data-view="table">Table</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="entriesContainer"></div>
+    </div>
+
+    <div id="detailView" class="detail-view" hidden></div>
+  </div>
+
+  <script src="store.js"></script>
+  <script src="dashboard.js"></script>
+</body>
+</html>

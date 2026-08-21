@@ -72,7 +72,7 @@ function NameAsImageDemo() {
 
       <p
         style={{
-          fontFamily: "'Plus Jakarta Sans', sans-serif",
+          fontFamily: "'Inclusive Sans', sans-serif",
           fontSize: 10,
           color: "rgba(33,32,18,0.32)",
           letterSpacing: "2px",
@@ -108,7 +108,7 @@ function NameAsImageDemo() {
           bottom: 10,
           fontSize: 10,
           color: "rgba(33,32,18,0.2)",
-          fontFamily: "'Plus Jakarta Sans', sans-serif",
+          fontFamily: "'Inclusive Sans', sans-serif",
           letterSpacing: "0.5px",
           textTransform: "uppercase",
         }}
@@ -258,7 +258,7 @@ function SceneTiltDemo() {
           bottom: 10,
           fontSize: 10,
           color: "rgba(33,32,18,0.2)",
-          fontFamily: "'Plus Jakarta Sans', sans-serif",
+          fontFamily: "'Inclusive Sans', sans-serif",
           letterSpacing: "0.5px",
           textTransform: "uppercase",
           zIndex: 10,
@@ -531,7 +531,7 @@ function ElasticWebDemo() {
           bottom: 10,
           fontSize: 10,
           color: "rgba(33,32,18,0.2)",
-          fontFamily: "'Plus Jakarta Sans', sans-serif",
+          fontFamily: "'Inclusive Sans', sans-serif",
           letterSpacing: "0.5px",
           textTransform: "uppercase",
           pointerEvents: "none",
@@ -734,7 +734,7 @@ function CinematicStripDemo() {
           bottom: 8,
           fontSize: 10,
           color: "rgba(33,32,18,0.2)",
-          fontFamily: "'Plus Jakarta Sans', sans-serif",
+          fontFamily: "'Inclusive Sans', sans-serif",
           letterSpacing: "0.5px",
           textTransform: "uppercase",
         }}
@@ -797,7 +797,7 @@ function DemoCard({ number, title, tagline, children, chosen, onChoose }: DemoCa
           <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 5 }}>
             <span
               style={{
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                fontFamily: "'Inclusive Sans', sans-serif",
                 fontSize: 10,
                 letterSpacing: "1.5px",
                 color: chosen ? "rgba(195,190,111,0.65)" : "rgba(33,32,18,0.28)",
@@ -820,7 +820,7 @@ function DemoCard({ number, title, tagline, children, chosen, onChoose }: DemoCa
           </div>
           <p
             style={{
-              fontFamily: "'Plus Jakarta Sans', sans-serif",
+              fontFamily: "'Inclusive Sans', sans-serif",
               fontSize: 12,
               color: chosen ? "rgba(227,217,206,0.42)" : "rgba(33,32,18,0.42)",
               lineHeight: 1.55,
@@ -843,7 +843,7 @@ function DemoCard({ number, title, tagline, children, chosen, onChoose }: DemoCa
               : "1.5px solid rgba(33,32,18,0.18)",
             background: chosen ? "rgba(195,190,111,0.12)" : "transparent",
             color: chosen ? "#c3be6f" : "rgba(33,32,18,0.45)",
-            fontFamily: "'Plus Jakarta Sans', sans-serif",
+            fontFamily: "'Inclusive Sans', sans-serif",
             fontSize: 11,
             fontWeight: 600,
             letterSpacing: "0.5px",
@@ -926,7 +926,7 @@ export function AnimationLabPage({ onBack }: Props) {
             cursor: "pointer",
             padding: "8px 0",
             color: "rgba(33,32,18,0.48)",
-            fontFamily: "'Plus Jakarta Sans', sans-serif",
+            fontFamily: "'Inclusive Sans', sans-serif",
             fontSize: 13,
             fontWeight: 500,
           }}
@@ -945,7 +945,7 @@ export function AnimationLabPage({ onBack }: Props) {
                 padding: "8px 16px",
                 borderRadius: 20,
                 background: "rgba(33,32,18,0.07)",
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                fontFamily: "'Inclusive Sans', sans-serif",
                 fontSize: 12,
                 color: "rgba(33,32,18,0.5)",
               }}
@@ -979,7 +979,7 @@ export function AnimationLabPage({ onBack }: Props) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
           style={{
-            fontFamily: "'Plus Jakarta Sans', sans-serif",
+            fontFamily: "'Inclusive Sans', sans-serif",
             fontSize: 14,
             color: "rgba(33,32,18,0.48)",
             maxWidth: 460,
@@ -1032,7 +1032,7 @@ export function AnimationLabPage({ onBack }: Props) {
               color: "#e3d9ce",
               padding: "14px 28px",
               borderRadius: 40,
-              fontFamily: "'Plus Jakarta Sans', sans-serif",
+              fontFamily: "'Inclusive Sans', sans-serif",
               fontSize: 13,
               fontWeight: 600,
               boxShadow: "0 8px 32px rgba(33,32,18,0.35)",

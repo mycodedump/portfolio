@@ -1,21 +1,11 @@
-import { useRef, useEffect, useState } from "react";
+import { useState } from "react";
 import type { ReactNode } from "react";
 import { motion } from "motion/react";
-import gsap from "gsap";
 import { ExternalLink } from "lucide-react";
 import { useIsMobile } from "../useIsMobile";
+import { InfiniteCircularGallery } from "./InfiniteCircularGallery";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
-
-const PHOTO_CARDS = [
-  { bg: "#c3be6f", label: "sketchbook", idx: "01" },
-  { bg: "#dda1ae", label: "bali 2023",  idx: "02" },
-  { bg: "#c67d39", label: "wood carving", idx: "03" },
-  { bg: "#d2ce93", label: "badminton",  idx: "04" },
-  { bg: "#ebc7cf", label: "coffee walks", idx: "05" },
-];
-
-const N = PHOTO_CARDS.length;
 
 const CURRENTLY_READING = {
   title: "Master of the Game",
@@ -58,147 +48,6 @@ const BLR: { place: string; cat: "eat" | "explore" | "hangout" }[] = [
   { place: "Church Street Social",cat:"hangout"},
   { place: "Toit Brewpub",      cat: "hangout" },
 ];
-
-// fan spread positions — desktop (stack pos 0=bottom → 4=top)
-const FAN = [
-  { x: -110, y: 18, rot: -16 },
-  { x: -56,  y: -6, rot: -8  },
-  { x:   0,  y:  0, rot:  0  },
-  { x:  58,  y: -6, rot:  8  },
-  { x: 112,  y: 18, rot: 16  },
-];
-
-// fan spread for mobile (smaller cards, tighter spread)
-const FAN_MOBILE = [
-  { x: -72, y: 14, rot: -14 },
-  { x: -36, y: -4, rot: -7  },
-  { x:   0, y:  0, rot:  0  },
-  { x:  38, y: -4, rot:  7  },
-  { x:  74, y: 14, rot: 14  },
-];
-
-// ── GSAP photo stack ───────────────────────────────────────────────────────────
-
-function PhotoStack({ mobile = false }: { mobile?: boolean }) {
-  const cardW = mobile ? 200 : 260;
-  const cardH = mobile ? 261 : 340;
-  const containerW = mobile ? 370 : 500;
-  const containerH = mobile ? 330 : 420;
-  const fanSpread = mobile ? FAN_MOBILE : FAN;
-
-  const cardRefs   = useRef<Array<HTMLDivElement | null>>([]);
-  const orderRef   = useRef<number[]>([0, 1, 2, 3, 4]);
-  const hovRef     = useRef(false);
-  const tapping    = useRef(false);
-  const idleTweens = useRef<gsap.core.Tween[]>([]);
-  const [hint, setHint] = useState(mobile ? "tap to cycle" : "hover to fan · click to cycle");
-
-  function els() { return cardRefs.current.filter(Boolean) as HTMLDivElement[]; }
-
-  function stackAll(animate: boolean) {
-    orderRef.current.forEach((ci, pos) => {
-      const el = els()[ci];
-      if (!el) return;
-      const props = { x: pos * 3, y: -pos * 1.8, rotation: (pos - 2) * 2, scale: 1 - (N - 1 - pos) * 0.018, zIndex: pos + 1 };
-      animate ? gsap.to(el, { ...props, duration: 0.42, ease: "power3.out" }) : gsap.set(el, props);
-    });
-  }
-
-  function fanAll() {
-    orderRef.current.forEach((ci, pos) => {
-      const el = els()[ci];
-      if (!el) return;
-      const f = fanSpread[pos];
-      gsap.to(el, { x: f.x, y: f.y, rotation: f.rot, scale: 1, zIndex: pos + 1, duration: 0.46, ease: "power3.out" });
-    });
-  }
-
-  function startIdle() {
-    stopIdle();
-    els().forEach((el, i) => {
-      idleTweens.current.push(
-        gsap.to(el, { y: `+=${5 + i * 1.2}`, duration: 1.9 + i * 0.28, repeat: -1, yoyo: true, ease: "sine.inOut", delay: i * 0.22 })
-      );
-    });
-  }
-
-  function stopIdle() {
-    idleTweens.current.forEach((t) => t.kill());
-    idleTweens.current = [];
-  }
-
-  function cycleTop() {
-    if (tapping.current) return;
-    tapping.current = true;
-    const order = orderRef.current;
-    const topCi = order[N - 1];
-    const el = els()[topCi];
-    if (!el) { tapping.current = false; return; }
-    stopIdle();
-    const exitX = mobile ? 160 : 220;
-    gsap.to(el, {
-      x: exitX, y: -60, rotation: 24, opacity: 0, scale: 0.8, duration: 0.32, ease: "power2.in",
-      onComplete: () => {
-        orderRef.current = [topCi, ...order.slice(0, N - 1)];
-        gsap.set(el, { x: -50, y: 50, rotation: -18, opacity: 0, scale: 0.8, zIndex: 0 });
-        gsap.to(el, { opacity: 1, duration: 0.18, delay: 0.06 });
-        if (mobile) {
-          fanAll();
-        } else {
-          stackAll(true);
-          if (!hovRef.current) setTimeout(startIdle, 520);
-        }
-        tapping.current = false;
-      },
-    });
-  }
-
-  useEffect(() => {
-    if (mobile) {
-      // on mobile: start stacked, fan in after a short delay for a nice reveal
-      stackAll(false);
-      const t = setTimeout(() => fanAll(), 400);
-      return () => clearTimeout(t);
-    } else {
-      stackAll(false);
-      startIdle();
-      return () => { stopIdle(); };
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
-      <div
-        style={{ width: containerW, height: containerH, display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}
-        {...(!mobile && {
-          onMouseEnter: () => { hovRef.current = true; stopIdle(); fanAll(); setHint("click any card to cycle"); },
-          onMouseLeave: () => { hovRef.current = false; stackAll(true); setTimeout(startIdle, 520); setHint("hover to fan · click to cycle"); },
-        })}
-      >
-        {PHOTO_CARDS.map((p, i) => (
-          <div
-            key={i}
-            ref={(el) => { cardRefs.current[i] = el; }}
-            onClick={cycleTop}
-            style={{ position: "absolute", width: cardW, height: cardH, borderRadius: 16, backgroundColor: p.bg, border: "3px solid rgba(255,255,255,0.68)", boxShadow: "0 8px 36px rgba(33,32,18,0.16)", cursor: "pointer", overflow: "hidden", willChange: "transform" }}
-          >
-            <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0.06 }} viewBox={`0 0 ${cardW} ${cardH}`}>
-              {Array.from({ length: Math.floor(cardW / 20) }).map((_, j) => <line key={`v${j}`} x1={j * 20} y1={0} x2={j * 20} y2={cardH} stroke="#212012" strokeWidth={0.5} />)}
-              {Array.from({ length: Math.floor(cardH / 20) }).map((_, j) => <line key={`h${j}`} x1={0} y1={j * 20} x2={cardW} y2={j * 20} stroke="#212012" strokeWidth={0.5} />)}
-            </svg>
-            <svg style={{ position: "absolute", top: "42%", left: "50%", transform: "translate(-50%,-50%)", opacity: 0.14 }} width={40} height={40} viewBox="0 0 24 24" fill="none">
-              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" stroke="#212012" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
-              <circle cx="12" cy="13" r="4" stroke="#212012" strokeWidth={1.5} />
-            </svg>
-            <p className="font-caslon" style={{ position: "absolute", bottom: 14, left: 14, fontSize: mobile ? 11 : 13, color: "#212012", fontStyle: "italic", opacity: 0.42 }}>{p.label}</p>
-            <p className="font-spline" style={{ position: "absolute", top: 12, right: 14, fontSize: 10, color: "#212012", opacity: 0.22 }}>{p.idx}</p>
-          </div>
-        ))}
-      </div>
-      <p className="font-jakarta" style={{ fontSize: 12, color: "#625e37", opacity: 0.38, textAlign: "center" }}>{hint}</p>
-    </div>
-  );
-}
 
 // ── Shared helpers ─────────────────────────────────────────────────────────────
 
@@ -263,12 +112,12 @@ function BookCard() {
 
       {/* Currently reading */}
       <div style={{ background: "rgba(195,190,111,0.1)", borderRadius: 10, padding: "12px 14px", marginBottom: 12, border: "1px solid rgba(195,190,111,0.25)" }}>
-        <p className="font-jakarta font-medium uppercase" style={{ fontSize: 9, letterSpacing: "0.5px", color: "#625e37", marginBottom: 6, opacity: 0.65 }}>currently reading</p>
+        <p className="font-inclusive-sans font-medium uppercase" style={{ fontSize: 9, letterSpacing: "0.5px", color: "#625e37", marginBottom: 6, opacity: 0.65 }}>currently reading</p>
         <div style={{ display: "flex", alignItems: "stretch", gap: 10 }}>
           <div style={{ width: 4, borderRadius: 4, backgroundColor: CURRENTLY_READING.spine, flexShrink: 0, alignSelf: "stretch", minHeight: 36 }} />
           <div style={{ flex: 1, paddingTop: 2, paddingBottom: 2 }}>
-            <p className="font-jakarta font-medium" style={{ fontSize: 13, color: "#212012", lineHeight: "17px" }}>{CURRENTLY_READING.title}</p>
-            <p className="font-jakarta" style={{ fontSize: 11, color: "#625e37", opacity: 0.6, marginTop: 1 }}>{CURRENTLY_READING.author}</p>
+            <p className="font-inclusive-sans font-medium" style={{ fontSize: 13, color: "#212012", lineHeight: "17px" }}>{CURRENTLY_READING.title}</p>
+            <p className="font-inclusive-sans" style={{ fontSize: 11, color: "#625e37", opacity: 0.6, marginTop: 1 }}>{CURRENTLY_READING.author}</p>
           </div>
         </div>
         {/* Progress bar */}
@@ -281,19 +130,19 @@ function BookCard() {
             style={{ height: "100%", borderRadius: 3, background: CURRENTLY_READING.spine }}
           />
         </div>
-        <p className="font-jakarta" style={{ fontSize: 10, color: "#625e37", opacity: 0.45, marginTop: 4 }}>{CURRENTLY_READING.progress}% through</p>
+        <p className="font-inclusive-sans" style={{ fontSize: 10, color: "#625e37", opacity: 0.45, marginTop: 4 }}>{CURRENTLY_READING.progress}% through</p>
       </div>
 
       {/* Previously read */}
-      <p className="font-jakarta font-medium uppercase" style={{ fontSize: 9, letterSpacing: "0.5px", color: "#625e37", marginBottom: 6, opacity: 0.65 }}>previously read</p>
+      <p className="font-inclusive-sans font-medium uppercase" style={{ fontSize: 9, letterSpacing: "0.5px", color: "#625e37", marginBottom: 6, opacity: 0.65 }}>previously read</p>
       <div style={{ display: "flex", flexDirection: "column" }}>
         {PREVIOUSLY_READ.map((book, i) => (
           <HoverRowDiv key={book.title} isLast={i === PREVIOUSLY_READ.length - 1}>
             <div style={{ display: "flex", alignItems: "stretch", gap: 10 }}>
               <div style={{ width: 4, borderRadius: 4, backgroundColor: book.spine, flexShrink: 0, alignSelf: "stretch", minHeight: 34 }} />
               <div style={{ paddingTop: 2, paddingBottom: 2 }}>
-                <p className="font-jakarta font-medium" style={{ fontSize: 13, color: "#212012", lineHeight: "17px" }}>{book.title}</p>
-                <p className="font-jakarta" style={{ fontSize: 11, color: "#625e37", opacity: 0.6, marginTop: 1 }}>{book.author}</p>
+                <p className="font-inclusive-sans font-medium" style={{ fontSize: 13, color: "#212012", lineHeight: "17px" }}>{book.title}</p>
+                <p className="font-inclusive-sans" style={{ fontSize: 11, color: "#625e37", opacity: 0.6, marginTop: 1 }}>{book.author}</p>
               </div>
             </div>
           </HoverRowDiv>
@@ -331,7 +180,7 @@ function MusicCard() {
       <div style={{ background: "#212012", borderRadius: 12, padding: "14px 14px 12px", marginBottom: 14 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
           <Waveform active={isPlaying} />
-          <p className="font-jakarta font-medium uppercase" style={{ fontSize: 9, color: "#1DB954", letterSpacing: "0.5px", marginLeft: 2 }}>now playing</p>
+          <p className="font-inclusive-sans font-medium uppercase" style={{ fontSize: 9, color: "#1DB954", letterSpacing: "0.5px", marginLeft: 2 }}>now playing</p>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           {/* Album art placeholder */}
@@ -339,8 +188,8 @@ function MusicCard() {
             <span style={{ fontSize: 20 }}>🎵</span>
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <p className="font-jakarta font-medium" style={{ fontSize: 13, color: "#e3d9ce", lineHeight: "16px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{MOCK_TRACK.name}</p>
-            <p className="font-jakarta" style={{ fontSize: 11, color: "rgba(227,217,206,0.5)", marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{MOCK_TRACK.artist}</p>
+            <p className="font-inclusive-sans font-medium" style={{ fontSize: 13, color: "#e3d9ce", lineHeight: "16px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{MOCK_TRACK.name}</p>
+            <p className="font-inclusive-sans" style={{ fontSize: 11, color: "rgba(227,217,206,0.5)", marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{MOCK_TRACK.artist}</p>
           </div>
         </div>
         {/* Progress bar */}
@@ -353,13 +202,13 @@ function MusicCard() {
             style={{ height: "100%", borderRadius: 2, background: "#1DB954" }}
           />
         </div>
-        <p className="font-jakarta" style={{ fontSize: 9, color: "rgba(227,217,206,0.25)", marginTop: 6, textAlign: "center", letterSpacing: "0.3px" }}>
+        <p className="font-inclusive-sans" style={{ fontSize: 9, color: "rgba(227,217,206,0.25)", marginTop: 6, textAlign: "center", letterSpacing: "0.3px" }}>
           connect spotify to see your real activity
         </p>
       </div>
 
       {/* Top artists */}
-      <p className="font-jakarta font-medium uppercase" style={{ fontSize: 9, letterSpacing: "0.5px", color: "#625e37", marginBottom: 6, opacity: 0.65 }}>top artists</p>
+      <p className="font-inclusive-sans font-medium uppercase" style={{ fontSize: 9, letterSpacing: "0.5px", color: "#625e37", marginBottom: 6, opacity: 0.65 }}>top artists</p>
       <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
         {MUSIC.map((artist, i) => (
           <motion.div
@@ -369,8 +218,8 @@ function MusicCard() {
             style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "5px 6px", borderRadius: 7, cursor: "pointer" }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <span className="font-jakarta" style={{ fontSize: 10, color: "rgba(98,94,55,0.3)", width: 14, textAlign: "right", flexShrink: 0 }}>{i + 1}</span>
-              <p className="font-jakarta font-medium" style={{ fontSize: 13, color: "#625e37" }}>{artist.name}</p>
+              <span className="font-inclusive-sans" style={{ fontSize: 10, color: "rgba(98,94,55,0.3)", width: 14, textAlign: "right", flexShrink: 0 }}>{i + 1}</span>
+              <p className="font-inclusive-sans font-medium" style={{ fontSize: 13, color: "#625e37" }}>{artist.name}</p>
             </div>
             <ExternalLink size={10} color="rgba(98,94,55,0.3)" />
           </motion.div>
@@ -389,10 +238,10 @@ function FollowCard() {
           <HoverRowLink key={item.name} href={item.url} isLast={i === FOLLOWING.length - 1}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                <p className="font-jakarta font-medium" style={{ fontSize: 13, color: "#212012" }}>{item.name}</p>
+                <p className="font-inclusive-sans font-medium" style={{ fontSize: 13, color: "#212012" }}>{item.name}</p>
                 <ExternalLink size={9} color="rgba(33,32,18,0.2)" />
               </div>
-              <span className="font-jakarta" style={{ fontSize: 9, color: "#c67d39", backgroundColor: "rgba(198,125,57,0.1)", padding: "2px 8px", borderRadius: 10, letterSpacing: "0.3px" }}>
+              <span className="font-inclusive-sans" style={{ fontSize: 9, color: "#c67d39", backgroundColor: "rgba(198,125,57,0.1)", padding: "2px 8px", borderRadius: 10, letterSpacing: "0.3px" }}>
                 {item.platform}
               </span>
             </div>
@@ -414,14 +263,14 @@ function BLRCard() {
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         {cats.map((cat) => (
           <div key={cat}>
-            <p className="font-jakarta font-medium uppercase" style={{ fontSize: 9, letterSpacing: "0.5px", color: catColor[cat], marginBottom: 6 }}>{cat}</p>
+            <p className="font-inclusive-sans font-medium uppercase" style={{ fontSize: 9, letterSpacing: "0.5px", color: catColor[cat], marginBottom: 6 }}>{cat}</p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
               {BLR.filter((b) => b.cat === cat).map((item) => (
                 <motion.span
                   key={item.place}
                   whileHover={{ scale: 1.05, backgroundColor: catColor[item.cat] }}
                   transition={{ duration: 0.14 }}
-                  className="font-jakarta font-medium"
+                  className="font-inclusive-sans font-medium"
                   style={{ fontSize: 12, color: "#212012", backgroundColor: catBg[item.cat], padding: "4px 10px", borderRadius: 20, border: `1px solid ${catColor[item.cat]}30`, cursor: "pointer" }}
                 >
                   {item.place}
@@ -454,13 +303,13 @@ export function PersonalSection({ onAboutOpen }: PersonalSectionProps) {
         transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         style={{ textAlign: "center", marginBottom: 56 }}
       >
-        <p className="font-jakarta font-medium uppercase" style={{ fontSize: 12, letterSpacing: "0.48px", color: "#625e37", marginBottom: 12 }}>
+        <p className="font-inclusive-sans font-medium uppercase" style={{ fontSize: 12, letterSpacing: "0.48px", color: "#625e37", marginBottom: 12 }}>
           beyond pixels
         </p>
         <p className="font-caslon not-italic" style={{ fontSize: isMobile ? 32 : 40, lineHeight: isMobile ? "40px" : "48px", color: "#212012", fontWeight: 600 }}>
           i have a life outside of figma
         </p>
-        <p className="font-jakarta" style={{ fontSize: 16, color: "#625e37", opacity: 0.7, marginTop: 12 }}>
+        <p className="font-inclusive-sans" style={{ fontSize: 16, color: "#625e37", opacity: 0.7, marginTop: 12 }}>
           sketches, wood carving, badminton, and opinions on too many things
         </p>
 
@@ -491,9 +340,18 @@ export function PersonalSection({ onAboutOpen }: PersonalSectionProps) {
         )}
       </motion.div>
 
-      <div style={{ marginBottom: isMobile ? 48 : 72, display: "flex", justifyContent: "center", overflow: "hidden" }}>
-        <PhotoStack mobile={isMobile} />
-      </div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-60px" }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        style={{ marginBottom: isMobile ? 48 : 72 }}
+      >
+        <InfiniteCircularGallery height={isMobile ? 300 : 420} />
+        <p className="font-inclusive-sans" style={{ fontSize: 12, color: "#625e37", opacity: 0.38, textAlign: "center", marginTop: 14 }}>
+          drag or scroll to spin
+        </p>
+      </motion.div>
 
       <div style={{ display: "flex", gap: 14, flexDirection: isMobile ? "column" : "row", flexWrap: "wrap" }}>
         <BookCard />

@@ -1,0 +1,37 @@
+{
+  "manifest_version": 3,
+  "name": "Job Hunt Tracker",
+  "description": "Capture job postings as you browse: company, role, responsibilities and requirements, so you can review and tailor your resume before applying. Everything stays on your own device.",
+  "version": "2.1.0",
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["icons/logo.svg"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "commands": {
+    "save-current-job": {
+      "suggested_key": {
+        "default": "Alt+Shift+J"
+      },
+      "description": "Save the current job posting to your dashboard"
+    }
+  },
+  "permissions": ["activeTab", "scripting", "storage"]
+}

@@ -1,8 +1,12 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X, Play, Pause, Volume2 } from "lucide-react";
+import { Lottie } from "lottie-react";
 import { useIsMobile } from "@/app/useIsMobile";
 import { useAudioPlayer } from "@/app/useAudioPlayer";
+
+// ─── CS2 cover (ICICI FASTag) — animated cover, native size 1800×1200 (3:2) ───
+import coverAnimationUrl from "../../assets/FASTag/videos/cover nw.json?url";
 
 // Pre-generated ElevenLabs narration lives in public/audio/ (see scripts/generate-voiceovers.mjs)
 // — base-aware so it resolves correctly whether served at "/" locally or "/portfolio/" on GitHub Pages.
@@ -203,14 +207,56 @@ export const CASE_STUDY_DATA: CaseStudyInfo[] = [
 //                 24px before a title-2/title-3, 12px after a title-2/title-3,
 //                 20px between two consecutive image containers (.cs-img)
 // .cs-bullets   → wraps a bullet <ul>: 8px between bullet points
+// .cs-mt-*      → optional override: add alongside any child's className to force
+//                 a specific margin-top instead of the default cs-flow rhythm,
+//                 e.g. className="cs-t2 cs-mt-40". Scale: 4, 8, 12, 16, 20, 24, 40.
+// <Spacer />    → drop it anywhere inside .cs-flow instead of reaching for margin-top.
+//                 It's an empty div whose height IS the gap — the rule below cancels
+//                 cs-flow's automatic rhythm on the spacer itself and on whatever comes
+//                 right after it, so the space you see is exactly `size`px, never added
+//                 on top of the 16px default. Scale: 4, 8, 12, 16, 20, 24, 40.
 const CS_SPACING_CSS = `
   .cs-sections > * + * { margin-top: 40px; }
   .cs-flow > * + * { margin-top: 16px; }
   .cs-flow > * + .cs-t2, .cs-flow > * + .cs-t3 { margin-top: 24px; }
-  .cs-flow > .cs-t2 + *, .cs-flow > .cs-t3 + * { margin-top: 12px; }
+  .cs-flow > .cs-t2 + *, .cs-flow > .cs-t3 + * { margin-top: 16px; }
+  .cs-flow > .cs-p + .cs-p { margin-top: 20px; }
+  .cs-flow > * + .cs-img { margin-top: 24px; }
+  .cs-flow > .cs-img + * { margin-top: 24px; }
   .cs-flow > .cs-img + .cs-img { margin-top: 20px; }
+  @media (max-width: 768px) {
+    .cs-img { margin-left: -16px; margin-right: -16px; width: calc(100% + 32px) !important; border-radius: 0 !important; }
+    .cs-img-frame { border-radius: 0 !important; }
+  }
   .cs-bullets > li + li { margin-top: 8px; }
+  .cs-bullets { list-style: none; }
+  .cs-bullets > li { display: flex; gap: 8px; }
+  .cs-bullets > li::before {
+    content: "→";
+    font-family: 'Libre Caslon Condensed', serif;
+    font-size: 1em;
+    flex-shrink: 0;
+  }
+  .cs-bullets strong { font-weight: 500; }
+  .cs-bullets li span { font-weight: 400; font-size: calc(1em - 2px); }
+  .cs-bullets-accent > li::before { color: #735933; }
+  .cs-mt-4 { margin-top: 4px !important; }
+  .cs-mt-8 { margin-top: 8px !important; }
+  .cs-mt-12 { margin-top: 12px !important; }
+  .cs-mt-16 { margin-top: 16px !important; }
+  .cs-mt-20 { margin-top: 20px !important; }
+  .cs-mt-24 { margin-top: 24px !important; }
+  .cs-mt-40 { margin-top: 40px !important; }
+  .cs-flow > .cs-spacer, .cs-flow > .cs-spacer + * { margin-top: 0 !important; }
 `;
+
+// ─── Spacer: exact, one-off vertical space anywhere inside .cs-flow ──────────
+// Usage: <Spacer size={24} /> between any two elements. Pick from the shared
+// scale (4, 8, 12, 16, 20, 24, 40) so spacing stays consistent across case studies.
+type CSSpacingSize = 0 | 4 | 8 | 12 | 16 | 20 | 24 | 40 ;
+function Spacer({ size = 16 }: { size?: CSSpacingSize }) {
+  return <div className="cs-spacer" style={{ height: size, flexShrink: 0 }} aria-hidden="true" />;
+}
 
 // ─── Shared: card thumbnail placeholder ──────────────────────────────────────
 export function ThumbnailPlaceholder({
@@ -233,6 +279,17 @@ export function ThumbnailPlaceholder({
   );
 }
 
+// ─── FASTag cover: Lottie animation, native 1800×1200 (3:2) ──────────────────
+// Width fills its container; height hugs the animation's own aspect ratio,
+// so it scales down proportionally instead of stretching to a fixed box.
+function CoverAnimation({ radius = 0 }: { radius?: number }) {
+  return (
+    <div style={{ width: "100%", aspectRatio: "1800 / 1200", borderRadius: radius, overflow: "hidden" }}>
+      <Lottie src={coverAnimationUrl} loop autoplay style={{ width: "100%", height: "100%" }} />
+    </div>
+  );
+}
+
 // ─── Universal image treatment: 5px-rounded, 1px white stroke sitting outside the edge ──
 // A plain `border` sits inside the box and dents the rounded clip — this draws the stroke
 // as a separate absolutely-positioned sibling instead, exactly like PhoneStrip's original technique.
@@ -245,14 +302,13 @@ function StrokedImage({
 }) {
   return (
     <div style={{ position: "relative", width: "100%", ...(aspectRatio ? { aspectRatio } : { height: height ?? "100%" }) }}>
-      <div style={{ width: "100%", height: "100%", borderRadius: radius, overflow: "hidden", backgroundColor: bgColor }}>
+      <div className="cs-img-frame" style={{ width: "100%", height: "100%", borderRadius: radius, overflow: "hidden", backgroundColor: bgColor }}>
         {src ? (
           <img src={src} alt={alt} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
         ) : (
           <ThumbnailPlaceholder bgColor={bgColor} strokeColor={strokeColor} height="100%" iconSize={iconSize} />
         )}
       </div>
-      <div style={{ position: "absolute", inset: -1, border: "1px solid #ffffff", borderRadius: radius + 1, pointerEvents: "none" }} />
     </div>
   );
 }
@@ -275,11 +331,57 @@ function SectionBlock({ id, children }: { id: string; children: React.ReactNode 
 }
 
 // ─── Content helpers ──────────────────────────────────────────────────────────
-function MetaField({ label, value }: { label: string; value: string }) {
+// ─── Desktop meta-chip strip (replaces the old left-sidebar meta list) ────────
+// Matches Figma "Frame 1597884687": two rows of "dash + shape" markers followed
+// by an italic Caslon label and the value, each chip sliding in left→right on mount.
+type MetaChipShape = "square" | "diamond" | "circle" | "arrow";
+
+function MetaChipMarker({ shape }: { shape: MetaChipShape }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-      <p className="font-jakarta font-normal" style={{ fontSize: 12, letterSpacing: "0.48px", color: "#c67d39" }}>{label}</p>
-      <p className="font-jakarta font-semibold" style={{ fontSize: 12, letterSpacing: "0.1px", color: "#212012", lineHeight: "18px" }}>{value}</p>
+    <div style={{ display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center", width: 20, height: 14, flexShrink: 0 }}>
+      <div style={{ width: 12, height: 1, backgroundColor: "#c67d39", flexShrink: 0 }} />
+      {shape === "square" && <div style={{ width: 8, height: 8, backgroundColor: "#c67d39", flexShrink: 0 }} />}
+      {shape === "diamond" && <div style={{ width: 7, height: 7, backgroundColor: "#c67d39", transform: "rotate(45deg)", flexShrink: 0 }} />}
+      {shape === "circle" && <div style={{ width: 8, height: 8, borderRadius: 8, backgroundColor: "#c67d39", flexShrink: 0 }} />}
+      {shape === "arrow" && (
+        <div style={{
+          width: 0, height: 0, flexShrink: 0,
+          borderTop: "4px solid transparent", borderBottom: "4px solid transparent",
+          borderLeft: "6px solid #c67d39",
+        }} />
+      )}
+    </div>
+  );
+}
+
+function MetaChip({ shape, label, value, grow, delay }: { shape: MetaChipShape; label: string; value: string; grow?: boolean; delay: number }) {
+  return (
+    <motion.div
+      initial={{ x: -20, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      transition={{ duration: 0.45, delay, ease: [0.16, 1, 0.3, 1] }}
+      style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 12, flex: grow ? 1 : "0 0 auto", minWidth: 0 }}
+    >
+      <MetaChipMarker shape={shape} />
+      <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-end", gap: 4, minWidth: 0 }}>
+        <p className="font-caslon" style={{ fontStyle: "italic", fontSize: 14, lineHeight: "18px", color: "#c67d39", flexShrink: 0 }}>{label}</p>
+        <p className="font-inclusive-sans font-normal" style={{ fontSize: 14, lineHeight: "17px", color: "#212012" }}>{value}</p>
+      </div>
+    </motion.div>
+  );
+}
+
+function MetaChipStrip({ caseStudy }: { caseStudy: CaseStudyInfo }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 12, width: "100%" }}>
+      <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-start", gap: 16, width: "100%" }}>
+        <MetaChip shape="square" label="for" value={caseStudy.client} delay={0} />
+        <MetaChip shape="diamond" label="for a duration of" value={caseStudy.timeline} delay={0.06} />
+        <MetaChip shape="circle" label="project is" value={caseStudy.status.toLowerCase()} grow delay={0.12} />
+      </div>
+      <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-start", gap: 16, width: "100%" }}>
+        <MetaChip shape="arrow" label="canvs team" value={caseStudy.designTeam.replace(/^Canvs\s*—\s*/, "")} grow delay={0.18} />
+      </div>
     </div>
   );
 }
@@ -305,14 +407,14 @@ function MobileMetaTable({ cs }: { cs: CaseStudyInfo }) {
         <div key={i} style={{ display: "flex", gap: 4, alignItems: "flex-start" }}>
           <div style={{
             width: 60, flexShrink: 0,
-            fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500,
+            fontFamily: "'Inclusive Sans', sans-serif", fontWeight: 500,
             color: "#c67d39", lineHeight: "normal",
           }}>
             {row.label}
           </div>
           <div style={{
-            flex: 1, fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600,
-            color: "#212012", lineHeight: "normal", wordBreak: "break-word",
+            flex: 1, fontFamily: "'Inclusive Sans', sans-serif", fontWeight: 500,
+            color: "#444444", lineHeight: "normal", wordBreak: "break-word",
           }}>
             {row.value}
           </div>
@@ -324,8 +426,8 @@ function MobileMetaTable({ cs }: { cs: CaseStudyInfo }) {
 
 function SectionHeading({ children, mobile = false }: { children: React.ReactNode; mobile?: boolean }) {
   return (
-    <p className="font-caslon not-italic" style={{
-      fontSize: mobile ? 16 : 20,
+    <p className="font-caslon not-italic cs-t2" style={{
+      fontSize: mobile ? 24 : 24,
       color: "#212012", fontWeight: 600, lineHeight: "normal",
     }}>
       {children}
@@ -333,13 +435,13 @@ function SectionHeading({ children, mobile = false }: { children: React.ReactNod
   );
 }
 
-function BodyText({ children, color = "#444", mobile = false }: { children: React.ReactNode; color?: string; mobile?: boolean }) {
+function BodyText({ children, color = "#444" }: { children: React.ReactNode; color?: string; mobile?: boolean }) {
   return (
-    <p className="font-jakarta font-normal" style={{
-      fontSize: mobile ? 12 : 14,
-      lineHeight: mobile ? "18px" : "20px",
+    <p className="font-inclusive-sans font-normal cs-p" style={{
+      fontSize: 16,
+      lineHeight: "24px",
       color,
-      letterSpacing: mobile ? "0.12px" : "0.14px",
+      letterSpacing: "0.15px",
     }}>
       {children}
     </p>
@@ -363,11 +465,11 @@ function OrangeBlockquote({ children, mobile = false }: { children: React.ReactN
 
 function SubHeading({ children, mobile = false }: { children: React.ReactNode; mobile?: boolean }) {
   return (
-    <p className="font-jakarta font-semibold cs-t2" style={{
-      fontSize: mobile ? 12 : 16,
-      lineHeight: mobile ? "18px" : "20px",
-      color: "#444",
-      letterSpacing: mobile ? "0.12px" : "0.16px",
+    <p className="font-inclusive-sans font-medium" style={{
+      fontSize: mobile ? 16 : 16,
+      lineHeight: mobile ? "24px" : "24px",
+      color: "#333333",
+      letterSpacing: mobile ? "0.15px" : "0.16px",
     }}>
       {children}
     </p>
@@ -385,48 +487,46 @@ function ImageCarousel({ slides, mobile = false, bgColor = "#e7ded5", maxWidth }
   const [active, setActive] = useState(0);
   const current = slides[active];
   const strokeColor = "#c67d39";
-  const thumbW = mobile ? 48 : 60;
-  const thumbH = mobile ? 32 : 40;
+  const thumbW = mobile ? 64 : 80;
+  const thumbH = mobile ? 44 : 54;
 
   return (
     <div className="cs-img" style={{ display: "flex", flexDirection: "column", gap: mobile ? 10 : 12, width: "100%", maxWidth: mobile ? undefined : maxWidth }}>
-      {/* Full frame — the one active slide.
-          Mobile padding is stepped down in multiples of 4px (24/24/20 → 8/8/8) so the
-          image itself claims more of the available width instead of sitting in a small frame. */}
+      {/* Full frame — the one active slide. Web: 16/12 padding, rounded 8. Mobile: edge-to-edge
+          (no side padding, no rounding), just a 10px gap before the caption row. */}
       <div
         style={{
           display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center",
-          padding: mobile ? "8px" : "24px 24px 20px",
+          padding: mobile ? "0 0 10px" : "16px 12px",
           gap: 10,
           width: "100%",
-          aspectRatio: "584 / 645",
           backgroundColor: bgColor,
-          borderRadius: 8,
+          borderRadius: mobile ? 0 : 8,
         }}
       >
         <div style={{
           display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center",
-          gap: mobile ? 12 : 16,
-          width: "96.64%",
+          gap: mobile ? 10 : 16,
+          width: "100%",
         }}>
-          <StrokedImage src={current.src} alt={current.caption} bgColor={bgColor} strokeColor={strokeColor} aspectRatio="518 / 572" iconSize={32} />
+          <StrokedImage src={current.src} alt={current.caption} bgColor={bgColor} strokeColor={strokeColor} aspectRatio="8 / 5" radius={8} iconSize={32} />
 
-          <div style={{ display: "flex", flexDirection: "row", alignItems: "center", padding: "0 4px", gap: 6, width: "100%", flexShrink: 0 }}>
-            <div style={{ width: 3, height: 13, borderRadius: 4, backgroundColor: strokeColor, flexShrink: 0 }} />
-            <p className="font-jakarta font-medium" style={{
+          <div style={{ display: "flex", flexDirection: "row", alignItems: "center", padding: mobile ? "0 12px" : "0 8px", gap: mobile ? 4 : 6, width: "100%", flexShrink: 0 }}>
+            <div style={{ width: mobile ? 2 : 3, height: mobile ? 12 : 13, borderRadius: 4, backgroundColor: strokeColor, flexShrink: 0 }} />
+            <p className={mobile ? "font-inclusive-sans font-normal" : "font-jakarta font-medium"} style={{
               flex: 1, minWidth: 0,
-              fontSize: 10, lineHeight: "13px", letterSpacing: "0.01em",
+              fontSize: 10, lineHeight: mobile ? "12px" : "13px", letterSpacing: "0.01em",
               color: "rgba(33,32,18,0.5)",
               whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
             }}>
               {current.caption}
             </p>
             <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 4, flexShrink: 0 }}>
-              <p className="font-jakarta font-medium" style={{ fontSize: 10, lineHeight: "13px", letterSpacing: "0.01em", color: "#735933" }}>
+              <p className={mobile ? "font-inclusive-sans font-normal" : "font-jakarta font-medium"} style={{ fontSize: 10, lineHeight: mobile ? "12px" : "13px", letterSpacing: "0.01em", color: "#735933" }}>
                 {active + 1}
               </p>
               <div style={{ width: 3, height: 3, borderRadius: "50%", backgroundColor: "rgba(115,89,51,0.3)" }} />
-              <p className="font-jakarta font-medium" style={{ fontSize: 10, lineHeight: "13px", letterSpacing: "0.01em", color: "rgba(115,89,51,0.5)" }}>
+              <p className={mobile ? "font-inclusive-sans font-normal" : "font-jakarta font-medium"} style={{ fontSize: 10, lineHeight: mobile ? "12px" : "13px", letterSpacing: "0.01em", color: "rgba(115,89,51,0.5)" }}>
                 {slides.length}
               </p>
             </div>
@@ -437,7 +537,7 @@ function ImageCarousel({ slides, mobile = false, bgColor = "#e7ded5", maxWidth }
       {/* Thumbnails — always all N slides (N = the counter's total), active one highlighted.
           Never conditionally removed, so the row never reorders and every slide stays reachable. */}
       {slides.length > 1 && (
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 12, padding: mobile ? "0 24px" : 0 }}>
           {slides.map((slide, i) => (
             <button
               key={i}
@@ -482,7 +582,7 @@ function LandingComparisonPanel({
   const captionRow = (text: string) => (
     <div style={{ display: "flex", flexDirection: "row", alignItems: "center", padding: "0 4px", gap: 6, width: "100%", flexShrink: 0 }}>
       <div style={{ width: 3, height: 13, borderRadius: 4, backgroundColor: strokeColor, flexShrink: 0 }} />
-      <p className="font-jakarta font-medium" style={{ fontSize: 10, lineHeight: "13px", letterSpacing: "0.01em", color: "rgba(33,32,18,0.5)" }}>
+      <p className="font-inclusive-sans font-medium" style={{ fontSize: 10, lineHeight: "13px", letterSpacing: "0.01em", color: "rgba(33,32,18,0.5)" }}>
         {text}
       </p>
     </div>
@@ -490,13 +590,13 @@ function LandingComparisonPanel({
 
   return (
     <div className="cs-img" style={{ display: "flex", flexDirection: "column", width: "100%", borderRadius: 8, overflow: "hidden" }}>
-      <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "24px 0 20px", gap: 10, width: "100%", backgroundColor: "#e7ded5" }}>
+      <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "20px 0", gap: 10, width: "100%", backgroundColor: "#e7ded5" }}>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 12, width: "45.72%" }}>
           <StrokedImage src={before} bgColor="#e7ded5" strokeColor={strokeColor} aspectRatio="267 / 80" />
           {captionRow(beforeCaption)}
         </div>
       </div>
-      <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "24px 0 20px", gap: 10, width: "100%", backgroundColor: "#ece6df" }}>
+      <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "20px 0", gap: 10, width: "100%", backgroundColor: "#ece6df" }}>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 12, width: "84.93%" }}>
           <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 24, width: "100%" }}>
             <div style={{ flex: 1, minWidth: 0 }}>
@@ -515,9 +615,9 @@ function LandingComparisonPanel({
 
 function IterationLabel({ children, mobile = false }: { children: React.ReactNode; mobile?: boolean }) {
   return (
-    <p className="font-jakarta font-semibold cs-t3" style={{
-      fontSize: mobile ? 12 : 14,
-      lineHeight: mobile ? "17px" : "20px",
+    <p className="font-inclusive-sans font-medium cs-t3" style={{
+      fontSize: mobile ? 16 : 18,
+      lineHeight: mobile ? "21px" : "24px",
       letterSpacing: "0.02em",
       textTransform: "uppercase",
       color: "#c67d39",
@@ -529,7 +629,7 @@ function IterationLabel({ children, mobile = false }: { children: React.ReactNod
 
 // Iteration thumbnail row — matches Figma's "Iteration - N" pattern: a caption above a
 // row of small same-height state thumbnails (not a big-image carousel like ImageCarousel).
-function IterationThumbnailRow({ caption, images, mobile = false }: { caption: string; images: string[]; mobile?: boolean }) {
+function IterationThumbnailRow({ caption, images, aspectRatio = "98 / 48", mobile = false }: { caption: string; images: string[]; aspectRatio?: string; mobile?: boolean }) {
   return (
     <div className="cs-img" style={{
       display: "flex", flexDirection: "column", gap: 12,
@@ -538,14 +638,14 @@ function IterationThumbnailRow({ caption, images, mobile = false }: { caption: s
     }}>
       <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 6 }}>
         <div style={{ width: 3, height: 13, borderRadius: 4, backgroundColor: "#c67d39", flexShrink: 0 }} />
-        <p className="font-jakarta font-medium" style={{ fontSize: 10, lineHeight: "13px", letterSpacing: "0.01em", color: "rgba(33,32,18,0.5)" }}>
+        <p className="font-inclusive-sans font-medium" style={{ fontSize: 10, lineHeight: "13px", letterSpacing: "0.01em", color: "rgba(33,32,18,0.5)" }}>
           {caption}
         </p>
       </div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
         {images.map((src, i) => (
           <div key={i} style={{ flex: mobile ? "1 1 28%" : "1 1 15%", minWidth: mobile ? 84 : 80 }}>
-            <StrokedImage src={src} bgColor="#e7ded5" strokeColor="#c67d39" aspectRatio="98 / 48" radius={4} />
+            <StrokedImage src={src} bgColor="#e7ded5" strokeColor="#c67d39" aspectRatio={aspectRatio} radius={0} />
           </div>
         ))}
       </div>
@@ -559,21 +659,29 @@ interface StateTreatmentRow { state: string; treatment: string; }
 function StateTreatmentTable({ rows, mobile = false }: { rows: StateTreatmentRow[]; mobile?: boolean }) {
   return (
     <div className="cs-img" style={{ display: "flex", flexDirection: "column", width: "100%", border: "1px solid #DACCBE", borderRadius: 12, overflow: "hidden" }}>
-      <div style={{ display: "flex", flexDirection: "row", alignItems: "center", width: "100%", backgroundColor: "#E3D9CE" }}>
-        <p className="font-jakarta font-semibold" style={{ flex: 1, padding: mobile ? "8px 0 8px 12px" : "8px 0 8px 16px", fontSize: 12, lineHeight: "20px", letterSpacing: "0.01em", textTransform: "uppercase", color: "#444444" }}>
+      <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 12, width: "100%", backgroundColor: "#E3D9CE" }}>
+        <p className="font-inclusive-sans font-medium" style={{
+          flex: 1, padding: mobile ? "12px 0 12px 12px" : "12px 0 12px 16px",
+          fontSize: 12, lineHeight: "20px", letterSpacing: "0.5px", textTransform: "uppercase", color: "#444444",
+        }}>
           State
         </p>
-        <p className="font-jakarta font-semibold" style={{ flex: 1, textAlign: "center", fontSize: 12, lineHeight: "20px", letterSpacing: "0.01em", textTransform: "uppercase", color: "#444444" }}>
+        <JTBDColumnDivider />
+        <p className="font-inclusive-sans font-medium" style={{
+          flex: 1, textAlign: "left", padding: mobile ? "12px 12px 12px 0" : "12px 16px 12px 0",
+          fontSize: 12, lineHeight: "20px", letterSpacing: "0.5px", textTransform: "uppercase", color: "#444444",
+        }}>
           Treatment
         </p>
       </div>
-      <div style={{ display: "flex", flexDirection: "column", width: "100%", backgroundColor: "#E7DED5", padding: mobile ? "8px 12px" : "12px 16px", gap: 12 }}>
+      <div style={{ display: "flex", flexDirection: "column", width: "100%", backgroundColor: "#E7DED5", padding: mobile ? "10px 14px" : "12px 16px", gap: 12 }}>
         {rows.map((row, i) => (
-          <div key={i} style={{ display: "flex", flexDirection: mobile ? "column" : "row", gap: mobile ? 4 : 16 }}>
-            <p className="font-jakarta font-semibold" style={{ flex: 1, fontSize: 12, lineHeight: "16px", letterSpacing: "0.01em", color: "#444444" }}>
+          <div key={i} style={{ display: "flex", flexDirection: "row", gap: 12 }}>
+            <p className="font-inclusive-sans font-medium" style={{ flex: 1, fontSize: 12, lineHeight: "16px", letterSpacing: "0.25px", color: "#444444" }}>
               {i + 1}. {row.state}
             </p>
-            <p className="font-jakarta font-normal" style={{ flex: 1, fontSize: 12, lineHeight: "20px", letterSpacing: "0.01em", color: "#444444" }}>
+            <JTBDColumnDivider />
+            <p className="font-inclusive-sans font-normal" style={{ flex: 1, fontSize: 12, lineHeight: "20px", letterSpacing: "0.25px", color: "#444444" }}>
               {row.treatment}
             </p>
           </div>
@@ -596,12 +704,11 @@ function ImageGrid2x2({ images }: { images: string[] }) {
 
 // ─── JTBD table (CS2 "Users and JTBD") — matches Figma "Frame 1597884686" 1:1 ──
 interface JTBDRow { job: string; context: string; }
-interface JTBDGroup { label: string; gradient: string; rows: JTBDRow[]; }
+interface JTBDGroup { label: string; rows: JTBDRow[]; }
 
 const JTBD_GROUPS: JTBDGroup[] = [
   {
     label: "FREQUENT + TIME-SENSITIVE + SURFACED ON CARD",
-    gradient: "linear-gradient(90deg, #F2EDE8 50%, rgba(231,222,213,0.7) 100%)",
     rows: [
       { job: "Recharge an existing FASTag", context: "Often urgent — user may be driving toward a toll gate" },
       { job: "Check available balance", context: "Often urgent — user may be driving toward a toll gate" },
@@ -609,13 +716,18 @@ const JTBD_GROUPS: JTBDGroup[] = [
   },
   {
     label: "OCCASIONAL + DELIBERATE + LIVES DEEPER",
-    gradient: "linear-gradient(90deg, rgba(231,222,213,0.7) 0%, #F2EDE8 50%, rgba(231,222,213,0.7) 100%)",
     rows: [
       { job: "Link or buy a new FASTag", context: "Considered action, done once, needs guidance" },
       { job: "Check recharge or transaction history", context: "Review mode — user is looking back, not forward" },
     ],
   },
 ];
+
+// Vertical divider between the JTBD/Context columns — table border colour, 1px stroke,
+// stretches to the height of whichever row it sits in.
+function JTBDColumnDivider() {
+  return <div style={{ alignSelf: "stretch", width: 1, backgroundColor: "#DACCBE", flexShrink: 0 }} />;
+}
 
 function JTBDTable({ mobile = false }: { mobile?: boolean }) {
   return (
@@ -624,16 +736,17 @@ function JTBDTable({ mobile = false }: { mobile?: boolean }) {
       width: "100%",
       border: "1px solid #DACCBE", borderRadius: 12, overflow: "hidden",
     }}>
-      <div style={{ display: "flex", flexDirection: "row", alignItems: "center", width: "100%", backgroundColor: "#E3D9CE" }}>
-        <p className="font-jakarta font-semibold" style={{
-          flex: 1, padding: mobile ? "8px 0 8px 12px" : "8px 0 8px 16px",
-          fontSize: 12, lineHeight: "20px", letterSpacing: "0.01em", textTransform: "uppercase", color: "#444444",
+      <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 12, width: "100%", backgroundColor: "#E3D9CE" }}>
+        <p className="font-inclusive-sans font-medium" style={{
+          flex: 1, padding: mobile ? "12px 0 12px 12px" : "12px 0 12px 16px",
+          fontSize: 12, lineHeight: "20px", letterSpacing: "0.5px", textTransform: "uppercase", color: "#444444",
         }}>
           JTBD
         </p>
-        <p className="font-jakarta font-semibold" style={{
-          flex: 1, textAlign: "center",
-          fontSize: 12, lineHeight: "20px", letterSpacing: "0.01em", textTransform: "uppercase", color: "#444444",
+        <JTBDColumnDivider />
+        <p className="font-inclusive-sans font-medium" style={{
+          flex: 1, textAlign: "left", padding: mobile ? "12px 12px 12px 0" : "12px 16px 12px 0",
+          fontSize: 12, lineHeight: "20px", letterSpacing: "0.5px", textTransform: "uppercase", color: "#444444",
         }}>
           Context
         </p>
@@ -642,28 +755,31 @@ function JTBDTable({ mobile = false }: { mobile?: boolean }) {
       {JTBD_GROUPS.map((group, gi) => (
         <div key={gi} style={{ display: "flex", flexDirection: "column", width: "100%" }}>
           <div style={{
-            display: "flex", alignItems: "flex-end", justifyContent: "center",
-            width: "100%", padding: mobile ? "8px 12px" : "8px 16px",
-            background: group.gradient,
+            display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 12,
+            width: "100%", padding: mobile ? "6px 12px" : "6px 16px",
+            backgroundColor: "#E3D9CE",
           }}>
-            <p className="font-jakarta font-bold" style={{
-              fontSize: 10, lineHeight: "13px", letterSpacing: "1px", textTransform: "uppercase",
-              color: "#735933", textAlign: "center",
+            <div style={{ boxSizing: "border-box", width: 1, height: 0, border: "1px solid #735933", flexShrink: 0 }} />
+            <p className="font-inclusive-sans font-normal" style={{
+              height: 12, fontSize: 10, lineHeight: "12px", display: "flex", alignItems: "flex-end", justifyContent: "center",
+              textAlign: "center", letterSpacing: "1px", textTransform: "uppercase", color: "#735933", flexShrink: 0,
             }}>
               {group.label}
             </p>
+            <div style={{ boxSizing: "border-box", width: 1, height: 0, border: "1px solid #735933", flexShrink: 0 }} />
           </div>
           <div style={{
             display: "flex", flexDirection: "column",
             width: "100%", backgroundColor: "#E7DED5",
-            padding: mobile ? "8px 12px" : "12px 16px", gap: 12,
+            padding: mobile ? "10px 14px" : "12px 16px", gap: 12,
           }}>
             {group.rows.map((row, ri) => (
-              <div key={ri} style={{ display: "flex", flexDirection: mobile ? "column" : "row", gap: mobile ? 4 : 16 }}>
-                <p className="font-jakarta font-semibold" style={{ flex: 1, fontSize: 12, lineHeight: "16px", letterSpacing: "0.01em", color: "#444444" }}>
+              <div key={ri} style={{ display: "flex", flexDirection: "row", gap: 12 }}>
+                <p className="font-inclusive-sans font-medium" style={{ flex: 1, fontSize: 12, lineHeight: "16px", letterSpacing: "0.25px", color: "#444444" }}>
                   {row.job}
                 </p>
-                <p className="font-jakarta font-normal" style={{ flex: 1, fontSize: 12, lineHeight: "20px", letterSpacing: "0.01em", color: "#444444" }}>
+                <JTBDColumnDivider />
+                <p className="font-inclusive-sans font-normal" style={{ flex: 1, fontSize: 12, lineHeight: "20px", letterSpacing: "0.25px", color: "#444444" }}>
                   {row.context}
                 </p>
               </div>
@@ -681,9 +797,9 @@ function HMWBullet({ num, text, mobile = false }: { num: number; text: string; m
       <div style={{ width: 3, backgroundColor: "#c67d39", alignSelf: "stretch", flexShrink: 0 }} />
       <div style={{ display: "flex", alignItems: "center", gap: 12, padding: mobile ? "10px 12px" : "12px 16px", flex: 1 }}>
         <div style={{ width: 20, height: 20, borderRadius: 16, backgroundColor: "#c67d39", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-          <p className="font-jakarta font-bold text-white" style={{ fontSize: 12, lineHeight: "16px", letterSpacing: "0.12px" }}>{num}</p>
+          <p className="font-inclusive-sans font-bold text-white" style={{ fontSize: 12, lineHeight: "16px", letterSpacing: "0.12px" }}>{num}</p>
         </div>
-        <p className="font-jakarta font-normal" style={{
+        <p className="font-inclusive-sans font-normal" style={{
           fontSize: mobile ? 12 : 13,
           lineHeight: mobile ? "18px" : "16px",
           color: "#444", letterSpacing: mobile ? "0.12px" : "0.13px",
@@ -724,6 +840,7 @@ function PhoneStrip({
           return (
             <div
               key={i}
+              className="cs-img-frame"
               style={{
                 position: "absolute", top: 16,
                 left: pos.left, right: pos.right,
@@ -732,7 +849,6 @@ function PhoneStrip({
               }}
             >
               <img src={img.src} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 5 }} />
-              <div style={{ position: "absolute", inset: -1, border: "1px solid #ffffff", borderRadius: 6, pointerEvents: "none" }} />
             </div>
           );
         })}
@@ -753,7 +869,7 @@ function PhoneStrip({
               display: "flex", alignItems: "flex-start", gap: 4,
             }}>
               <div style={{ width: 3, borderRadius: 4, backgroundColor: "#c67d39", minHeight: 10, flexShrink: 0, alignSelf: "flex-start", marginTop: 2 }} />
-              <p className="font-jakarta font-medium" style={{
+              <p className="font-inclusive-sans font-medium" style={{
                 fontSize: 8, color: "rgba(33,32,18,0.5)", letterSpacing: "0.08px",
                 wordBreak: "break-word", lineHeight: "11px",
               }}>
@@ -772,13 +888,12 @@ function PhoneStrip({
       {images.map((img, i) => (
         <div key={i} style={{ position: "absolute", top: img.top ?? 24, left: img.left, right: img.right, width: img.width ?? 150, height: img.height ?? 333, borderRadius: 5, overflow: "hidden", pointerEvents: "none" }}>
           <img src={img.src} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 5 }} />
-          <div style={{ position: "absolute", inset: -1, border: "1px solid rgba(255,255,255,0.8)", borderRadius: 6, pointerEvents: "none" }} />
         </div>
       ))}
       {labels?.map((label, i) => (
         <div key={i} style={{ position: "absolute", left: label.left, top: label.top, bottom: label.bottom, display: "flex", alignItems: "center", gap: 6 }}>
           <div style={{ width: 3, borderRadius: 4, backgroundColor: "#c67d39", height: "100%", minHeight: 14 }} />
-          <p className="font-jakarta font-medium" style={{ fontSize: 10, color: "rgba(33,32,18,0.5)", letterSpacing: "0.1px", whiteSpace: "nowrap" }}>{label.text}</p>
+          <p className="font-inclusive-sans font-medium" style={{ fontSize: 10, color: "rgba(33,32,18,0.5)", letterSpacing: "0.1px", whiteSpace: "nowrap" }}>{label.text}</p>
         </div>
       ))}
     </div>
@@ -790,7 +905,7 @@ function AudioPlayer({ color, slug }: { color: string; slug: string }) {
   const { playing, toggle, seekToFraction, available, progress, timeLabel } = useAudioPlayer(caseStudyAudioUrl(slug));
   return (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", gap: 12 }}>
-      <p className="font-jakarta font-medium" style={{ fontSize: 11, color: "rgba(227,217,206,0.5)", letterSpacing: "0.5px", textTransform: "uppercase" }}>
+      <p className="font-inclusive-sans font-medium" style={{ fontSize: 11, color: "rgba(227,217,206,0.5)", letterSpacing: "0.5px", textTransform: "uppercase" }}>
         Listen to this case study
       </p>
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -810,7 +925,7 @@ function AudioPlayer({ color, slug }: { color: string; slug: string }) {
         >
           <div style={{ width: `${progress * 100}%`, height: "100%", backgroundColor: color, borderRadius: 1 }} />
         </div>
-        <p className="font-jakarta" style={{ fontSize: 11, color: "rgba(227,217,206,0.4)", letterSpacing: "0.1px", flexShrink: 0 }}>
+        <p className="font-inclusive-sans" style={{ fontSize: 11, color: "rgba(227,217,206,0.4)", letterSpacing: "0.1px", flexShrink: 0 }}>
           {available ? timeLabel : "narration coming soon"}
         </p>
         <Volume2 size={13} color="rgba(227,217,206,0.35)" style={{ flexShrink: 0 }} />
@@ -827,7 +942,7 @@ function VideoFrame({ cs }: { cs: CaseStudyInfo }) {
         <div style={{ width: 48, height: 48, borderRadius: "50%", backgroundColor: "rgba(255,255,255,0.92)", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <Play size={20} fill="#212012" color="#212012" />
         </div>
-        <p className="font-jakarta font-medium" style={{ fontSize: 11, color: "rgba(255,255,255,0.65)", letterSpacing: "0.1px", textAlign: "center" }}>Case study walkthrough</p>
+        <p className="font-inclusive-sans font-medium" style={{ fontSize: 11, color: "rgba(255,255,255,0.65)", letterSpacing: "0.1px", textAlign: "center" }}>Case study walkthrough</p>
       </div>
     </div>
   );
@@ -847,7 +962,7 @@ function RelatedCard({ cs, onClick }: { cs: CaseStudyInfo; onClick: () => void }
       </div>
       <div style={{ padding: "14px 20px 20px", display: "flex", flexDirection: "column", gap: 10 }}>
         <div style={{ display: "inline-flex", backgroundColor: "rgba(33,32,18,0.12)", padding: "4px 12px", borderRadius: 100, alignSelf: "flex-start" }}>
-          <p className="font-jakarta font-semibold" style={{ fontSize: 10, color: cs.textColor, letterSpacing: "0.5px", textTransform: "uppercase" }}>{cs.label}</p>
+          <p className="font-inclusive-sans font-semibold" style={{ fontSize: 10, color: cs.textColor, letterSpacing: "0.5px", textTransform: "uppercase" }}>{cs.label}</p>
         </div>
         <p className="font-caslon" style={{ fontSize: 17, lineHeight: "23px", color: "#212012", fontWeight: 600 }}>{cs.title}</p>
       </div>
@@ -862,7 +977,7 @@ function CS1Content({ isMobile }: { isMobile: boolean }) {
     <div className="cs-sections" style={{ display: "flex", flexDirection: "column" }}>
       <SectionBlock id="cs-problem">
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <SectionHeading mobile={m}>THE PROBLEM</SectionHeading>
+          <SectionHeading mobile={m}>1. THE PROBLEM</SectionHeading>
           <div className="cs-flow" style={{ display: "flex", flexDirection: "column" }}>
             <BodyText mobile={m}>
               ICICI Bank credit cards were declining 30% of international transactions. Not because the cards didn't work abroad (ICICI Bank cards have global acceptance across Visa and Mastercard) but because of a structural reason: by RBI mandate, every new or reissued card ships with international usage switched off by default.
@@ -896,7 +1011,7 @@ function CS1Content({ isMobile }: { isMobile: boolean }) {
 
       <SectionBlock id="cs-toggle">
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <SectionHeading mobile={m}>Why this isn't just a toggle problem</SectionHeading>
+          <SectionHeading mobile={m}>3. Why this isn't just a toggle problem</SectionHeading>
           <div className="cs-flow" style={{ display: "flex", flexDirection: "column" }}>
             <BodyText mobile={m}>{`It's tempting to read "30% decline" and reach for the obvious fix: surface the toggle more prominently. That fix would help, but it doesn't touch the harder layer: RBI's framework requires separate switches for International Cash, POS, ATM, and E-commerce.`}</BodyText>
             <PhoneStrip
@@ -913,7 +1028,7 @@ function CS1Content({ isMobile }: { isMobile: boolean }) {
 
       <SectionBlock id="cs-flow">
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <SectionHeading mobile={m}>Getting users into the flow, before they ever need it</SectionHeading>
+          <SectionHeading mobile={m}>4. Getting users into the flow, before they ever need it</SectionHeading>
           <div className="cs-flow" style={{ display: "flex", flexDirection: "column" }}>
             <BodyText mobile={m}>Most ICICI cardholders barely open the iMobile app — bill payments happen through third-party apps like CRED, PhonePe, GPay. If iTravel only lived inside the app, it would only reach people already looking for it.</BodyText>
             <div className="cs-img">
@@ -934,10 +1049,10 @@ function CS1Content({ isMobile }: { isMobile: boolean }) {
 
       <SectionBlock id="cs-trip">
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <SectionHeading mobile={m}>Declaring the trip — the part that does the real work</SectionHeading>
+          <SectionHeading mobile={m}>5. Declaring the trip — the part that does the real work</SectionHeading>
           <div className="cs-flow" style={{ display: "flex", flexDirection: "column" }}>
             <SubHeading mobile={m}>Once inside the flow, the user declares:</SubHeading>
-            <ul className="font-jakarta font-normal cs-bullets" style={{ fontSize: m ? 12 : 14, lineHeight: m ? "18px" : "20px", color: "#444", letterSpacing: m ? "0.12px" : "0.14px", paddingLeft: 18 }}>
+            <ul className="font-inclusive-sans font-normal cs-bullets" style={{ fontSize: 14, lineHeight: "20px", color: "#444", letterSpacing: "0.14px", paddingLeft: m ? 12 : 16, paddingRight: m ? 12 : 16 }}>
               <li><strong>Destination(s)</strong> — single or multi-country, with layover and transit stops</li>
               <li><strong>Travel dates</strong> — start/end, with per-leg duration for multi-country trips</li>
             </ul>
@@ -970,15 +1085,15 @@ function CS2Content({ isMobile }: { isMobile: boolean }) {
     <div className="cs-sections" style={{ display: "flex", flexDirection: "column" }}>
       <SectionBlock id="cs-intro">
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <SectionHeading mobile={m}>INTRODUCTION</SectionHeading>
-          <div className="cs-flow" style={{ display: "flex", flexDirection: "column" }}>
+          <SectionHeading mobile={m}>1. Introduction</SectionHeading>
+          <div className="cs-flow " style={{ display: "flex", flexDirection: "column"  }}>
             <BodyText mobile={m}>
               FASTag is mandatory for all four-wheelers on Indian highways, and ICICI Bank commands nearly 29% of the national FASTag market. Before this project, every one of those customers relied solely on iMobile or a third-party app to manage their tag.
             </BodyText>
             <BodyText mobile={m}>
               I designed the entire FASTag experience for RIB from scratch. No brief. No precedent. Just iMobile's existing flows as reference, a fixed two-week deadline, and three distinct user types that needed to coexist on the same platform.
             </BodyText>
-
+            <Spacer size={isMobile ? 24 : 40} />
             <SectionHeading mobile={m}>Users and JTBD</SectionHeading>
             <BodyText mobile={m}>
               With the reference I had, before designing the screens, I mapped four core jobs users come to FASTag to do. These drove every layout and hierarchy decision that followed.
@@ -993,11 +1108,31 @@ function CS2Content({ isMobile }: { isMobile: boolean }) {
             <SubHeading mobile={m}>
               That's exactly why the card works the way it does:
             </SubHeading>
-            <ul className="font-jakarta font-normal cs-bullets" style={{ fontSize: m ? 12 : 14, lineHeight: m ? "18px" : "20px", color: "#444", letterSpacing: m ? "0.12px" : "0.14px", paddingLeft: 18 }}>
-              <li><strong>Vehicle number and model</strong> — you can scan it in under two seconds, no reading needed</li>
-              <li><strong>Balance</strong> — it's the biggest thing on the card, impossible to miss</li>
-              <li><strong>Recharge</strong> — one tap, always there, always in the same spot no matter the card state</li>
-              <li><strong>Everything else</strong> — tucked behind the three-dot menu or the detail page, out of the way until you actually need it</li>
+            <ul className="font-inclusive-sans font-normal cs-bullets cs-bullets-accent" style={{ fontSize: 16, lineHeight: "24px", color: "#444", letterSpacing: "0.15px", paddingLeft: m ? 12 : 16, paddingRight: m ? 12 : 16 }}>
+              <li>
+                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                  <strong style={{ color: "#735933" }}>Vehicle number and model</strong>
+                  <span>You can scan it in under 2-seconds, no reading needed.</span>
+                </div>
+              </li>
+              <li>
+                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                  <strong style={{ color: "#735933" }}>Balance</strong>
+                  <span>It's the biggest thing on the card, impossible to miss.</span>
+                </div>
+              </li>
+              <li>
+                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                  <strong style={{ color: "#735933" }}>Recharge</strong>
+                  <span>One tap, always there, always in the same spot no matter the card state.</span>
+                </div>
+              </li>
+              <li>
+                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                  <strong style={{ color: "#735933" }}>Everything else</strong>
+                  <span>Tucked behind the three-dot menu or the detail page, out of the way until you actually need it.</span>
+                </div>
+              </li>
             </ul>
             <BodyText mobile={m}>
               The secondary stuff (tag replacement, KYC, close tag, raise a query) — sure, it matters. But it's not why someone opens FASTag at 11pm on the highway. Keeping it secondary isn't a compromise. That's the whole point.
@@ -1008,7 +1143,7 @@ function CS2Content({ isMobile }: { isMobile: boolean }) {
 
       <SectionBlock id="cs-landing">
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <SectionHeading mobile={m}>Landing page</SectionHeading>
+          <SectionHeading mobile={m}>2. Landing page</SectionHeading>
           <div className="cs-flow" style={{ display: "flex", flexDirection: "column" }}>
             <BodyText mobile={m}>
               One landing page. Three user types. Multiple card states. Everything had to be readable at a glance — including for fleet owners managing 20+ FASTags simultaneously.
@@ -1016,7 +1151,7 @@ function CS2Content({ isMobile }: { isMobile: boolean }) {
             <SubHeading mobile={m}>
               There are 3 user types:
             </SubHeading>
-            <ul className="font-jakarta font-normal cs-bullets" style={{ fontSize: m ? 12 : 14, lineHeight: m ? "18px" : "20px", color: "#444", letterSpacing: m ? "0.12px" : "0.14px", paddingLeft: 18 }}>
+            <ul className="font-inclusive-sans font-normal cs-bullets" style={{ fontSize: 14, lineHeight: "20px", color: "#444", letterSpacing: "0.14px", paddingLeft: m ? 12 : 16, paddingRight: m ? 12 : 16 }}>
               <li>New user</li>
               <li>Existing users (ICICI Bank and non-ICICI Bank)</li>
               <li>Fleet owners (ICICI Bank and non-ICICI Bank)</li>
@@ -1024,7 +1159,6 @@ function CS2Content({ isMobile }: { isMobile: boolean }) {
 
             <ImageCarousel
               mobile={m}
-              maxWidth={324}
               slides={[
                 { src: imgLandingEmpty, caption: "New user with no FASTags" },
                 { src: imgLandingExisting, caption: "Existing user with ICICI Bank and other bank FASTag" },
@@ -1053,7 +1187,7 @@ function CS2Content({ isMobile }: { isMobile: boolean }) {
 
       <SectionBlock id="cs-card">
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <SectionHeading mobile={m}>FASTag card exploration</SectionHeading>
+          <SectionHeading mobile={m}>3. FASTag card exploration</SectionHeading>
           <div className="cs-flow" style={{ display: "flex", flexDirection: "column" }}>
             <SubHeading mobile={m}>
               The problem
@@ -1069,6 +1203,7 @@ function CS2Content({ isMobile }: { isMobile: boolean }) {
             <IterationThumbnailRow
               mobile={m}
               caption="Iteration - 1"
+              aspectRatio="166 / 73"
               images={[imgIter1_1, imgIter1_2, imgIter1_3, imgIter1_4, imgIter1_5, imgIter1_6]}
             />
             <BodyText mobile={m}>
@@ -1079,6 +1214,7 @@ function CS2Content({ isMobile }: { isMobile: boolean }) {
             <IterationThumbnailRow
               mobile={m}
               caption="Iteration - 2"
+              aspectRatio="198 / 96"
               images={[imgIter2_1, imgIter2_2, imgIter2_3, imgIter2_4, imgIter2_5, imgIter2_6]}
             />
             <BodyText mobile={m}>
@@ -1113,7 +1249,7 @@ function CS2Content({ isMobile }: { isMobile: boolean }) {
 
       <SectionBlock id="cs-details">
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <SectionHeading mobile={m}>All FASTag details</SectionHeading>
+          <SectionHeading mobile={m}>4. All FASTag details</SectionHeading>
           <div className="cs-flow" style={{ display: "flex", flexDirection: "column" }}>
             <SubHeading mobile={m}>Three card types, one layout</SubHeading>
             <BodyText mobile={m}>
@@ -1138,9 +1274,14 @@ function CS2Content({ isMobile }: { isMobile: boolean }) {
             <BodyText mobile={m}>
               There have been various states and micro-interactions added to multiple sections of the landing. Scroll to view all the interactions.
             </BodyText>
-            <ImageCarousel mobile={m} slides={[{ src: imgStateDownload, caption: "Download history - button has a dropdown on hover" }]} />
-            <ImageCarousel mobile={m} slides={[{ src: imgStateFleetDropdown, caption: "For fleet owners - more than 4 will appear inside a dropdown" }]} />
-            <ImageCarousel mobile={m} slides={[{ src: imgStateHoverServices, caption: "Hovering on services will open a tooltip" }]} />
+            <ImageCarousel
+              mobile={m}
+              slides={[
+                { src: imgStateDownload, caption: "Download history - button has a dropdown on hover" },
+                { src: imgStateFleetDropdown, caption: "For fleet owners - more than 4 will appear inside a dropdown" },
+                { src: imgStateHoverServices, caption: "Hovering on services will open a tooltip" },
+              ]}
+            />
 
             <SubHeading mobile={m}>Filter and email FASTag history</SubHeading>
             <BodyText mobile={m}>
@@ -1172,7 +1313,7 @@ function CS2Content({ isMobile }: { isMobile: boolean }) {
 
       <SectionBlock id="cs-recharge">
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <SectionHeading mobile={m}>FASTag recharge</SectionHeading>
+          <SectionHeading mobile={m}>5. FASTag recharge</SectionHeading>
           <div className="cs-flow" style={{ display: "flex", flexDirection: "column" }}>
             <SubHeading mobile={m}>The problem with the first version</SubHeading>
             <BodyText mobile={m}>
@@ -1187,9 +1328,19 @@ function CS2Content({ isMobile }: { isMobile: boolean }) {
             <SubHeading mobile={m}>
               The vehicle type determines what's shown within that standard flow:
             </SubHeading>
-            <ul className="font-jakarta font-normal cs-bullets" style={{ fontSize: m ? 12 : 14, lineHeight: m ? "18px" : "20px", color: "#444", letterSpacing: m ? "0.12px" : "0.14px", paddingLeft: 18 }}>
-              <li><strong>For a linked vehicle</strong> — registration number pre-filled, balance visible, straight to amount.</li>
-              <li><strong>For a non-linked vehicle (first time)</strong> — registration number entry required, then the same flow.</li>
+            <ul className="font-inclusive-sans font-normal cs-bullets" style={{ fontSize: 14, lineHeight: "20px", color: "#444", letterSpacing: "0.14px", paddingLeft: m ? 12 : 16, paddingRight: m ? 12 : 16 }}>
+              <li>
+                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                  <strong>For a linked vehicle</strong>
+                  <span>Registration number pre-filled, balance visible, straight to amount.</span>
+                </div>
+              </li>
+              <li>
+                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                  <strong>For a non-linked vehicle (first time)</strong>
+                  <span>Registration number entry required, then the same flow.</span>
+                </div>
+              </li>
             </ul>
             <BodyText mobile={m}>
               The entry point context is resolved before the user enters the flow. Inside the flow, it is always the same.
@@ -1241,7 +1392,7 @@ function PlaceholderContent({ cs, isMobile }: { cs: CaseStudyInfo; isMobile: boo
       {ids.map((id, i) => (
         <SectionBlock key={id} id={id}>
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <SectionHeading mobile={m}>{labels[i]}</SectionHeading>
+            <SectionHeading mobile={m}>{i + 1}. {labels[i]}</SectionHeading>
             <div className="cs-flow" style={{ display: "flex", flexDirection: "column" }}>
               <BodyText mobile={m}>{cs.overview}</BodyText>
               <div className="cs-img">
@@ -1260,7 +1411,7 @@ function LeftPanelAudio({ color, slug }: { color: string; slug: string }) {
   const { playing, toggle, available, timeLabel } = useAudioPlayer(caseStudyAudioUrl(slug));
   return (
     <div style={{ paddingTop: 4 }}>
-      <p className="font-jakarta font-normal" style={{ fontSize: 11, letterSpacing: "0.5px", color: "rgba(33,32,18,0.4)", textTransform: "uppercase", marginBottom: 8 }}>
+      <p className="font-inclusive-sans font-normal" style={{ fontSize: 11, letterSpacing: "0.5px", color: "rgba(33,32,18,0.4)", textTransform: "uppercase", marginBottom: 8 }}>
         listen
       </p>
       <button
@@ -1278,10 +1429,10 @@ function LeftPanelAudio({ color, slug }: { color: string; slug: string }) {
           {playing ? <Pause size={12} color="#212012" fill="#212012" /> : <Play size={12} color="#212012" fill="#212012" />}
         </div>
         <div style={{ textAlign: "left" }}>
-          <p className="font-jakarta font-semibold" style={{ fontSize: 12, color: "#212012", lineHeight: "15px" }}>
+          <p className="font-inclusive-sans font-semibold" style={{ fontSize: 12, color: "#212012", lineHeight: "15px" }}>
             {!available ? "Narration coming soon" : playing ? "Playing..." : "Hear this case study"}
           </p>
-          <p className="font-jakarta" style={{ fontSize: 10, color: "rgba(33,32,18,0.5)", marginTop: 1 }}>
+          <p className="font-inclusive-sans" style={{ fontSize: 10, color: "rgba(33,32,18,0.5)", marginTop: 1 }}>
             {available ? (playing ? timeLabel : "audio narrative") : "check back soon"}
           </p>
         </div>
@@ -1300,23 +1451,27 @@ interface Props {
 export function CaseStudyDetail({ caseStudy, onClose, onNavigate }: Props) {
   const isMobile = useIsMobile(768);
   const scrollableRef = useRef<HTMLDivElement>(null);
+  // Desktop only: the right pane scrolls independently so the left index/listen
+  // column never moves — the outer scrollableRef stays fixed for desktop.
+  const rightPaneRef = useRef<HTMLDivElement>(null);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState<string>("");
 
   useEffect(() => {
     if (!caseStudy) return;
     scrollableRef.current?.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+    rightPaneRef.current?.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
     setScrolled(false);
     setActiveSection("");
   }, [caseStudy?.index]);
 
   useEffect(() => {
-    const el = scrollableRef.current;
+    const el = isMobile ? scrollableRef.current : rightPaneRef.current;
     if (!el) return;
     const handle = () => setScrolled(el.scrollTop > 60);
     el.addEventListener("scroll", handle, { passive: true });
     return () => el.removeEventListener("scroll", handle);
-  }, [caseStudy]);
+  }, [caseStudy, isMobile]);
 
   // Esc closes the drawer the same way the close icon does.
   useEffect(() => {
@@ -1329,7 +1484,7 @@ export function CaseStudyDetail({ caseStudy, onClose, onNavigate }: Props) {
   }, [caseStudy, onClose]);
 
   useEffect(() => {
-    const el = scrollableRef.current;
+    const el = isMobile ? scrollableRef.current : rightPaneRef.current;
     if (!el || !caseStudy) return;
     const obs = new IntersectionObserver(
       (entries) => {
@@ -1340,7 +1495,7 @@ export function CaseStudyDetail({ caseStudy, onClose, onNavigate }: Props) {
     const nodes = el.querySelectorAll("[data-section]");
     nodes.forEach((n) => obs.observe(n));
     return () => obs.disconnect();
-  }, [caseStudy]);
+  }, [caseStudy, isMobile]);
 
   const scrollToSection = useCallback((id: string) => {
     scrollableRef.current?.querySelector(`#${id}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -1348,7 +1503,7 @@ export function CaseStudyDetail({ caseStudy, onClose, onNavigate }: Props) {
 
   const sections = caseStudy ? (SECTIONS_BY_CS[caseStudy.index] ?? []) : [];
   const related = CASE_STUDY_DATA.filter((cs) => cs.index !== caseStudy?.index);
-  const headerH = scrolled ? 68 : 112;
+  const headerH = 112; // desktop header is a fixed height — see the DESKTOP LAYOUT header block below
 
   return (
     <AnimatePresence>
@@ -1416,11 +1571,14 @@ export function CaseStudyDetail({ caseStudy, onClose, onNavigate }: Props) {
                     transition: "border-color 0.3s ease",
                   }}>
                     <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
-                      <p className="font-caslon not-italic" style={{
-                        flex: 1, fontSize: 16, lineHeight: "normal", color: "#212012", fontWeight: 600,
-                      }}>
+                      <motion.p
+                        className="font-caslon not-italic"
+                        animate={{ fontSize: scrolled ? "16px" : "22px" }}
+                        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                        style={{ flex: 1, lineHeight: "normal", color: "#212012", fontWeight: 600 }}
+                      >
                         {caseStudy.title}
-                      </p>
+                      </motion.p>
                       <button
                         onClick={onClose}
                         style={{
@@ -1435,26 +1593,34 @@ export function CaseStudyDetail({ caseStudy, onClose, onNavigate }: Props) {
                       </button>
                     </div>
                     {/* Label pill */}
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8 }}>
+                    <Spacer size={8} />
+                    {/* <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       <div style={{ backgroundColor: caseStudy.color, padding: "3px 10px", borderRadius: 100, display: "inline-flex" }}>
-                        <p className="font-jakarta font-semibold" style={{ fontSize: 9, color: caseStudy.textColor, letterSpacing: "0.5px", textTransform: "uppercase" }}>
+                        <p className="font-inclusive-sans font-semibold" style={{ fontSize: 9, color: caseStudy.textColor, letterSpacing: "0.5px", textTransform: "uppercase" }}>
                           {caseStudy.label}
                         </p>
                       </div>
-                      <p className="font-jakarta font-medium" style={{ fontSize: 10, color: "#c67d39", letterSpacing: "0.4px", textTransform: "uppercase" }}>
+                      <p className="font-inclusive-sans font-medium" style={{ fontSize: 10, color: "#c67d39", letterSpacing: "0.4px", textTransform: "uppercase" }}>
                         {caseStudy.type}
                       </p>
-                    </div>
+                    </div> */}
                   </div>
 
-                  {/* Hero image: white, 264px */}
-                  <div style={{ height: 264, backgroundColor: "#ffffff", overflow: "hidden", flexShrink: 0 }}>
-                    <ThumbnailPlaceholder bgColor={caseStudy.imageBg} strokeColor={caseStudy.textColor} height={264} iconSize={40} />
+                  {/* Hero: FASTag gets its animated cover, others keep the 264px placeholder */}
+                  <div style={{ backgroundColor: "#ffffff", overflow: "hidden", flexShrink: 0 }}>
+                    {caseStudy.index === 1 ? (
+                      <CoverAnimation />
+                    ) : (
+                      <div style={{ height: 264 }}>
+                        <ThumbnailPlaceholder bgColor={caseStudy.imageBg} strokeColor={caseStudy.textColor} height={264} iconSize={40} />
+                      </div>
+                    )}
                   </div>
 
                   {/* Meta table + content */}
-                  <div style={{ padding: "16px 16px 0", display: "flex", flexDirection: "column", gap: 20 }}>
+                  <div style={{ padding: "16px 16px 0", display: "flex", flexDirection: "column" }}>
                     <MobileMetaTable cs={caseStudy} />
+                    <Spacer size={20} />
 
                     {/* Content */}
                     <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
@@ -1465,6 +1631,8 @@ export function CaseStudyDetail({ caseStudy, onClose, onNavigate }: Props) {
                         : <PlaceholderContent cs={caseStudy} isMobile={true} />
                       }
                     </div>
+                    <Spacer size={20} />
+                    <Spacer size={8} />
 
                     {/* Media strip — dark card */}
                     <motion.div
@@ -1472,15 +1640,17 @@ export function CaseStudyDetail({ caseStudy, onClose, onNavigate }: Props) {
                       whileInView={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.5 }}
                       viewport={{ once: true }}
-                      style={{ backgroundColor: "#212012", borderRadius: 12, padding: 16, display: "flex", flexDirection: "column", gap: 16, marginTop: 8 }}
+                      style={{ backgroundColor: "#212012", borderRadius: 12, padding: 16, display: "flex", flexDirection: "column", gap: 16 }}
                     >
                       {/* Audio player full-width on mobile */}
                       <AudioPlayer color={caseStudy.color} slug={caseStudy.slug} />
                     </motion.div>
+                    <Spacer size={20} />
+                    <Spacer size={8} />
 
                     {/* Related case studies — vertical stack on mobile */}
-                    <div style={{ marginTop: 8 }}>
-                      <p className="font-jakarta font-medium" style={{ fontSize: 10, letterSpacing: "0.5px", color: "rgba(33,32,18,0.4)", textTransform: "uppercase", marginBottom: 12 }}>
+                    <div>
+                      <p className="font-inclusive-sans font-medium" style={{ fontSize: 10, letterSpacing: "0.5px", color: "rgba(33,32,18,0.4)", textTransform: "uppercase", marginBottom: 12 }}>
                         Read more
                       </p>
                       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -1496,64 +1666,53 @@ export function CaseStudyDetail({ caseStudy, onClose, onNavigate }: Props) {
                 <>
                   <style>{`.cs-drawer::-webkit-scrollbar{display:none}`}</style>
 
-                  {/* Sticky shrinking header */}
+                  {/* Fixed-height header — kept constant so it never shifts the two-pane body below it
+                      (a shrinking header would push the static left column, which must never move) */}
                   <div
                     style={{
                       position: "sticky", top: 0, zIndex: 10,
                       backgroundColor: "#e3d9ce",
-                      padding: scrolled ? "14px 52px 12px 36px" : "36px 52px 20px 36px",
+                      padding: "36px 52px 20px 36px",
                       borderBottom: `1px solid ${scrolled ? "rgba(98,94,55,0.12)" : "transparent"}`,
-                      transition: "padding 0.3s ease, border-color 0.3s ease",
+                      transition: "border-color 0.3s ease",
                     }}
                   >
-                    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: scrolled ? 4 : 10 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
                       <div style={{ backgroundColor: caseStudy.color, padding: "4px 12px", borderRadius: 100, display: "inline-flex" }}>
-                        <p className="font-jakarta font-semibold" style={{ fontSize: 10, color: caseStudy.textColor, letterSpacing: "0.5px", textTransform: "uppercase" }}>
+                        <p className="font-inclusive-sans font-semibold" style={{ fontSize: 10, color: caseStudy.textColor, letterSpacing: "0.5px", textTransform: "uppercase" }}>
                           {caseStudy.label}
                         </p>
                       </div>
-                      <p className="font-jakarta font-medium" style={{ fontSize: 11, color: "#c67d39", letterSpacing: "0.48px", textTransform: "uppercase" }}>
+                      <p className="font-inclusive-sans font-medium" style={{ fontSize: 11, color: "#c67d39", letterSpacing: "0.48px", textTransform: "uppercase" }}>
                         {caseStudy.type}
                       </p>
                     </div>
-                    <motion.p
+                    <p
                       className="font-caslon not-italic"
-                      animate={{ fontSize: scrolled ? "16px" : "24px", lineHeight: scrolled ? "22px" : "30px" }}
-                      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                      style={{ color: "#212012", fontWeight: 600, paddingRight: 48, maxWidth: 720 }}
+                      style={{ color: "#212012", fontWeight: 600, fontSize: "24px", lineHeight: "30px", paddingRight: 48, maxWidth: 720 }}
                     >
                       {caseStudy.title}
-                    </motion.p>
+                    </p>
                   </div>
 
-                  {/* Two column body */}
-                  <div style={{ display: "flex", gap: 24, padding: "40px 36px 0", position: "relative" }}>
+                  {/* Two-pane body: left (index + listen) never scrolls; right pane owns its own scroll */}
+                  <div style={{ display: "flex", gap: 24, padding: "40px 36px 0", position: "relative", height: `calc(100vh - ${headerH}px)` }}>
 
-                    {/* Left column */}
+                    {/* Left column — static, does not scroll at all */}
                     <div
                       style={{
                         width: 200, flexShrink: 0,
-                        position: "sticky", top: headerH, alignSelf: "flex-start",
                         display: "flex", flexDirection: "column", justifyContent: "space-between",
-                        height: `calc(100vh - ${headerH + 40}px)`,
                         paddingBottom: 24,
                       }}
                     >
-                      <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-                        <MetaField label="Client:" value={caseStudy.client} />
-                        <MetaField label="Team" value={caseStudy.designTeam} />
-                        <MetaField label="Role:" value={caseStudy.role} />
-                        <MetaField label="Team:" value={caseStudy.crossTeam} />
-                        <MetaField label="Timeline:" value={caseStudy.timeline} />
-                        <MetaField label="Status:" value={caseStudy.statusFull} />
-                        <LeftPanelAudio color={caseStudy.color} slug={caseStudy.slug} />
-                      </div>
+                      <LeftPanelAudio color={caseStudy.color} slug={caseStudy.slug} />
 
                       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                        <p className="font-jakarta font-normal" style={{ fontSize: 11, letterSpacing: "0.5px", color: "rgba(33,32,18,0.4)", textTransform: "uppercase", marginBottom: 4 }}>
+                        <p className="font-inclusive-sans font-normal" style={{ fontSize: 11, letterSpacing: "0.5px", color: "rgba(33,32,18,0.4)", textTransform: "uppercase", marginBottom: 4 }}>
                           index
                         </p>
-                        {sections.map((s) => (
+                        {sections.map((s, si) => (
                           <button
                             key={s.id}
                             onClick={() => scrollToSection(s.id)}
@@ -1565,26 +1724,38 @@ export function CaseStudyDetail({ caseStudy, onClose, onNavigate }: Props) {
                               style={{ height: 14, backgroundColor: caseStudy.color, borderRadius: 2, flexShrink: 0, overflow: "hidden" }}
                             />
                             <p
-                              className="font-jakarta font-normal"
+                              className="font-inclusive-sans font-normal"
                               style={{ fontSize: 12, letterSpacing: "0.12px", color: activeSection === s.id ? "#212012" : "rgba(33,32,18,0.4)", transition: "color 0.2s ease" }}
                             >
-                              {s.label}
+                              {si + 1}. {s.label}
                             </p>
                           </button>
                         ))}
                       </div>
                     </div>
 
-                    {/* Right column */}
-                    <div style={{ width: 584, flexShrink: 0 }}>
+                    {/* Right pane — the only thing that scrolls */}
+                    <div ref={rightPaneRef} className="cs-right-pane" style={{ flex: 1, minWidth: 0, maxWidth: 900, overflowY: "auto", overflowX: "hidden", scrollbarWidth: "none" }}>
+                      <style>{`.cs-right-pane::-webkit-scrollbar{display:none}`}</style>
+
                       <motion.div
                         initial={{ opacity: 0, scale: 0.98 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.6, delay: 0.1 }}
-                        style={{ height: 264, backgroundColor: "#ffffff", borderRadius: 8, marginBottom: 32, overflow: "hidden" }}
+                        style={{ backgroundColor: "#ffffff", borderRadius: 8, marginBottom: 32, overflow: "hidden" }}
                       >
-                        <ThumbnailPlaceholder bgColor={caseStudy.imageBg} strokeColor={caseStudy.textColor} height={264} iconSize={48} />
+                        {caseStudy.index === 1 ? (
+                          <CoverAnimation radius={8} />
+                        ) : (
+                          <div style={{ height: 264 }}>
+                            <ThumbnailPlaceholder bgColor={caseStudy.imageBg} strokeColor={caseStudy.textColor} height={264} iconSize={48} />
+                          </div>
+                        )}
                       </motion.div>
+
+                      <MetaChipStrip caseStudy={caseStudy} />
+
+                      <Spacer size={32} />
 
                       {caseStudy.index === 0
                         ? <CS1Content isMobile={false} />
@@ -1593,6 +1764,8 @@ export function CaseStudyDetail({ caseStudy, onClose, onNavigate }: Props) {
                         : <PlaceholderContent cs={caseStudy} isMobile={false} />
                       }
 
+                      <Spacer size={40} />
+                      <Spacer size={8} />
                       <motion.div
                         id="cs-media"
                         data-section
@@ -1600,31 +1773,31 @@ export function CaseStudyDetail({ caseStudy, onClose, onNavigate }: Props) {
                         whileInView={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                         viewport={{ once: true, margin: "-5%" }}
-                        style={{ marginTop: 48, marginBottom: 8, backgroundColor: "#212012", borderRadius: 16, padding: 24, display: "flex", gap: 20, alignItems: "center", scrollMarginTop: 88 }}
+                        style={{ marginBottom: 8, backgroundColor: "#212012", borderRadius: 16, padding: 24, display: "flex", gap: 20, alignItems: "center", scrollMarginTop: 88 }}
                       >
                         <VideoFrame cs={caseStudy} />
                         <AudioPlayer color={caseStudy.color} slug={caseStudy.slug} />
                       </motion.div>
+
+                      {/* Related — now scrolls inside the same right pane */}
+                      <motion.div
+                        initial={{ opacity: 0, y: 16 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+                        viewport={{ once: true }}
+                        style={{ padding: "48px 0 60px" }}
+                      >
+                        <p className="font-inclusive-sans font-medium" style={{ fontSize: 11, letterSpacing: "0.5px", color: "rgba(33,32,18,0.4)", textTransform: "uppercase", marginBottom: 16 }}>
+                          Read more
+                        </p>
+                        <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+                          {related.map((cs) => (
+                            <RelatedCard key={cs.index} cs={cs} onClick={() => onNavigate(cs)} />
+                          ))}
+                        </div>
+                      </motion.div>
                     </div>
                   </div>
-
-                  {/* Bottom: related */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 16 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-                    viewport={{ once: true }}
-                    style={{ padding: "48px 36px 60px", paddingLeft: 260 }}
-                  >
-                    <p className="font-jakarta font-medium" style={{ fontSize: 11, letterSpacing: "0.5px", color: "rgba(33,32,18,0.4)", textTransform: "uppercase", marginBottom: 16 }}>
-                      Read more
-                    </p>
-                    <div style={{ display: "flex", gap: 16 }}>
-                      {related.map((cs) => (
-                        <RelatedCard key={cs.index} cs={cs} onClick={() => onNavigate(cs)} />
-                      ))}
-                    </div>
-                  </motion.div>
                 </>
               )}
             </div>

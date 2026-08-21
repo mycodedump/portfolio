@@ -8,7 +8,7 @@ import {
   ThumbnailPlaceholder,
   type CaseStudyInfo,
 } from "./CaseStudyDetail";
-import svgIcici from "../../imports/Frame1597884659-1/svg-b40dn3nm6i";
+import imgIciciLogo from "../../assets/Cards CS/ICICI logo.png";
 
 const DARK_H = 183;
 const CARD_H = 418;
@@ -16,29 +16,18 @@ const EXTRA_SCROLL = 700;
 const CORNER = "M17.6301 16.5H0C12.2624 16.1105 16.976 14.1809 17.6301 0V16.5Z";
 const TAB_LEFT = [34, 253, 472];
 
+// Mobile sticky-stack sizing (mirrors DARK_H/CARD_H but for the narrower phone layout)
+const MOBILE_DARK_H = 90;
+const MOBILE_CARD_H = 478;
+
 function IciciBankLogo() {
   return (
     <div style={{ width: 80, height: 16, overflow: "hidden", position: "relative", flexShrink: 0 }}>
-      <svg
-        style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
-        fill="none"
-        viewBox="0 0 79.7365 15.7377"
-        preserveAspectRatio="none"
-      >
-        <path d={svgIcici.p28ddf800} fill="#004A7F" />
-        <path d={svgIcici.p1309cc00} fill="#004A7F" />
-        <path d={svgIcici.p1e17ff00} fill="#004A7F" />
-        <path d={svgIcici.p252ce000} fill="#004A7F" />
-        <path d={svgIcici.pe7e5b60} fill="#004A7F" />
-        <path d={svgIcici.p10482b80} fill="#004A7F" />
-        <path d={svgIcici.p3ce65400} fill="#004A7F" />
-        <path d={svgIcici.p2e830f00} fill="#004A7F" />
-        <path d={svgIcici.p2ded8b00} fill="#004A7F" />
-        <path d={svgIcici.p2cded400} fill="#F06321" />
-        <path d={svgIcici.p291a8a70} fill="#212012" />
-        <path d={svgIcici.p34b10ef2} fill="#AE282E" />
-        <path d={svgIcici.p5435100} fill="#F06321" />
-      </svg>
+      <img
+        src={imgIciciLogo}
+        alt="ICICI Bank"
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain" }}
+      />
     </div>
   );
 }
@@ -46,26 +35,31 @@ function IciciBankLogo() {
 function CardTab({ color, label }: { color: string; label: string }) {
   return (
     <div style={{ display: "flex", alignItems: "flex-end" }}>
-      <svg width="17.63" height="16.5" viewBox="0 0 17.6301 16.5" fill="none" style={{ display: "block" }}>
+      <svg width="11" height="10" viewBox="0 0 11 10" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ position: "relative", top: "-0.5px",left:"0.25px" }}>
+<path d="M11 10H0C7.65088 9.76396 10.5919 8.59449 11 0V10Z" fill={color}/>
+</svg>
+
+      {/* <svg width="18" height="16" viewBox="0 0 18 16" fill="none" style={{ display: "block" }}>
         <path d={CORNER} fill={color} />
-      </svg>
+      </svg> */}
       <div
         style={{
           backgroundColor: color,
-          padding: "10px 24px",
+          padding: "8px 16px",
           borderRadius: "16px 16px 0 0",
           display: "flex",
           alignItems: "center",
         }}
       >
-        <p className="font-jakarta font-semibold text-[#212012] whitespace-nowrap" style={{ fontSize: 16, letterSpacing: "0.64px" }}>
+        <p className="font-inclusive-sans font-medium text-[#212012] whitespace-nowrap" style={{ fontSize: 12, letterSpacing: "0.25px" }}>
           {label}
         </p>
       </div>
-      <div style={{ transform: "scaleX(-1)" }}>
-        <svg width="17.63" height="16.5" viewBox="0 0 17.6301 16.5" fill="none" style={{ display: "block" }}>
-          <path d={CORNER} fill={color} />
-        </svg>
+      <div>
+<svg width="11" height="10" viewBox="0 0 11 10" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ position: "relative", top: "-0.5px",left:"-0.25px" }}>
+<path d="M0 10H11C3.34912 9.76396 0.408119 8.59449 0 0V10Z" fill={color}/>
+</svg>
+
       </div>
     </div>
   );
@@ -101,8 +95,8 @@ const CARDS: CardConfig[] = [
     clientName: "ICICI Bank",
     clientBadgeBg: "rgba(98,94,55,0.15)",
     isIcici: true,
-    cardTitle: "Redesigning ICICI Bank's mobile onboarding experience",
-    statusText: "SHIPPED — 2023",
+    cardTitle: "Redesigning how 10M+ ICICI Bank cardholders activate their card for international travel",
+    statusText: "under development • 2026",
     statusColor: "#625e37",
   },
   {
@@ -114,11 +108,11 @@ const CARDS: CardConfig[] = [
     tabLeft: TAB_LEFT[1],
     imageLeft: false,
     roundedAll: false,
-    clientName: "Canvs Studio",
+    clientName: "ICICI Bank",
     clientBadgeBg: "rgba(33,32,18,0.12)",
     isIcici: false,
-    cardTitle: "Building Canvs Studio from 0 → 1 as sole designer",
-    statusText: "IN PROGRESS",
+    cardTitle: "Bringing India's most-used toll payment system to ICICI's web platform — for the first time",
+    statusText: "under development • 2026",
     statusColor: "#212012",
   },
   {
@@ -130,11 +124,11 @@ const CARDS: CardConfig[] = [
     tabLeft: TAB_LEFT[2],
     imageLeft: true,
     roundedAll: true,
-    clientName: "Self-initiated",
+    clientName: "Viisa • Freelance",
     clientBadgeBg: "rgba(33,32,18,0.1)",
     isIcici: false,
     cardTitle: "AI experiments — exploring what's possible with LLMs",
-    statusText: "ONGOING",
+    statusText: "Completed • 2023",
     statusColor: "#212012",
   },
 ];
@@ -154,7 +148,7 @@ function ClientBadge({ card }: { card: CardConfig }) {
       {card.isIcici ? (
         <IciciBankLogo />
       ) : (
-        <p className="font-jakarta font-semibold" style={{ fontSize: 12, color: card.textColor, letterSpacing: "0.24px" }}>
+        <p className="font-inclusive-sans font-semibold" style={{ fontSize: 12, color: card.textColor, letterSpacing: "0.24px" }}>
           {card.clientName}
         </p>
       )}
@@ -182,13 +176,13 @@ function CardBody({ card, hovered, onClick }: { card: CardConfig; hovered: boole
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         <ClientBadge card={card} />
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <p className="font-jakarta font-medium uppercase" style={{ fontSize: 11, letterSpacing: "0.44px", color: card.textColor, opacity: 0.8 }}>
+          <p className="font-inclusive-sans font-medium uppercase" style={{ fontSize: 11, letterSpacing: "0.44px", color: card.textColor, opacity: 0.8 }}>
             UX + UI
           </p>
           <svg width="3" height="3" viewBox="0 0 3 3" fill="none">
             <circle cx="1.5" cy="1.5" r="1.5" fill={card.dotColor} />
           </svg>
-          <p className="font-jakarta font-medium uppercase" style={{ fontSize: 11, letterSpacing: "0.44px", color: card.textColor, opacity: 0.8 }}>
+          <p className="font-inclusive-sans font-medium uppercase" style={{ fontSize: 11, letterSpacing: "0.44px", color: card.textColor, opacity: 0.8 }}>
             Sole designer
           </p>
         </div>
@@ -208,7 +202,7 @@ function CardBody({ card, hovered, onClick }: { card: CardConfig; hovered: boole
       <div style={{ marginTop: 20 }}>
         <div style={{ height: 1, backgroundColor: `${card.dotColor}30`, marginBottom: 12 }} />
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <p className="font-jakarta font-medium uppercase" style={{ fontSize: 10, letterSpacing: "0.4px", color: card.statusColor, opacity: 0.65 }}>
+          <p className="font-inclusive-sans font-medium uppercase" style={{ fontSize: 10, letterSpacing: "0.4px", color: card.statusColor, opacity: 0.65 }}>
             {card.statusText}
           </p>
           {/* Read CTA with hover effects */}
@@ -284,7 +278,7 @@ function CardWithTab({ card, onClick }: { card: CardConfig; onClick: () => void 
 // Curved tab connector matching Frame9-1 Figma design
 function TabCurve({ color }: { color: string }) {
   return (
-    <svg width={17.63} height={16.5} viewBox="0 0 17.6301 16.5" fill="none" style={{ display: "block", flexShrink: 0 }}>
+    <svg width={17.63} height={16.5} viewBox="0 0 17.6301 16.5" fill="none" style={{ display: "block", flexShrink: 0, position: "relative", top: "0.5px", left: "0.25px" }}>
       <path d="M17.6301 16.5H0C12.2624 16.1105 16.976 14.1809 17.6301 0V16.5Z" fill={color} />
     </svg>
   );
@@ -300,77 +294,57 @@ function MobileCardTab({ label, bgColor, align }: { label: string; bgColor: stri
 
   return (
     <div style={{ display: "flex", alignItems: "flex-end", justifyContent: isRight ? "flex-end" : "flex-start", paddingLeft: indentLeft, paddingRight: indentRight }}>
-      {!isRight && <TabCurve color={bgColor} />}
-      <div style={{ background: bgColor, padding: "8px 20px", borderRadius: "12px 12px 0 0" }}>
-        <p className="font-jakarta font-semibold uppercase" style={{ fontSize: 11, letterSpacing: "0.48px", color: "#212012", whiteSpace: "nowrap" }}>{label}</p>
+      <TabCurve color={bgColor} />
+      <div style={{ background: bgColor, padding: "6px 20px",position: "relative", top: "1px", borderRadius: "12px 12px 0 0" }}>
+        <p className="font-inclusive-sans font-semibold uppercase" style={{ fontSize: 11, letterSpacing: "0.48px", color: "#212012", whiteSpace: "nowrap" }}>{label}</p>
       </div>
-      <svg width={17.63} height={16.5} viewBox="0 0 17.6301 16.5" fill="none" style={{ display: "block", flexShrink: 0, transform: "scaleX(-1)" }}>
+      <svg width={17.63} height={16.5} viewBox="0 0 17.6301 16.5" fill="none" style={{ display: "block", flexShrink: 0, transform: "scaleX(-1)", position: "relative", top: "0.5px", left: "-0.25px" }}>
         <path d="M17.6301 16.5H0C12.2624 16.1105 16.976 14.1809 17.6301 0V16.5Z" fill={bgColor} />
       </svg>
     </div>
   );
 }
 
-// ── Mobile: vertical card list matching Frame9-1 Figma ─────────────────────────
-function MobileCardList({ onSelect }: { onSelect: (cs: CaseStudyInfo) => void }) {
-  const isLast = (i: number) => i === CARDS.length - 1;
+// ── Mobile: sticky-stack card matching the desktop scroll-stack behavior ───────
+function MobileStackCard({ card, align, onClick }: { card: CardConfig; align: "left" | "indent" | "right"; onClick: () => void }) {
   return (
-    <div style={{ backgroundColor: "#212012", padding: "40px 0 48px" }}>
-      <p className="font-caslon uppercase text-center" style={{ color: "#e3d9ce", fontSize: 24, lineHeight: "30px", marginBottom: 24, paddingLeft: 16, paddingRight: 16 }}>
-        select projects
-      </p>
-      <div style={{ display: "flex", flexDirection: "column", gap: 0, paddingLeft: 10, paddingRight: 10 }}>
-        {CARDS.map((card, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-40px" }}
-            transition={{ duration: 0.55, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
-            style={{ marginBottom: isLast(i) ? 0 : 20 }}
-          >
-            {/* Tab label above card */}
-            <MobileCardTab label={card.label} bgColor={card.bgColor} align={TAB_ALIGN[i]} />
+    <div>
+      <MobileCardTab label={card.label} bgColor={card.bgColor} align={align} />
+      <div
+        onClick={onClick}
+        style={{
+          backgroundColor: card.bgColor,
+          borderRadius: card.roundedAll ? 16 : "0 16px 0 0",
+          overflow: "hidden",
+          cursor: "pointer",
+          height: MOBILE_CARD_H,
+          position: "relative",
+        }}
+      >
+        {/* Image area: matches Figma top-20, left-16, h-172, rounded-4 */}
+        <div style={{ position: "absolute", top: 20, left: 16, right: 16, height: 172, borderRadius: 4, overflow: "hidden" }}>
+          <ThumbnailPlaceholder bgColor={card.imageBg} strokeColor={card.textColor} height="100%" iconSize={28} />
+        </div>
 
-            {/* Card body */}
-            <div
-              onClick={() => onSelect(CASE_STUDY_DATA[i])}
-              style={{
-                backgroundColor: card.bgColor,
-                borderRadius: isLast(i) ? 16 : "0 16px 0 0",
-                overflow: "hidden",
-                cursor: "pointer",
-                minHeight: isLast(i) ? 344 : 478,
-                position: "relative",
-              }}
-            >
-              {/* Image area: matches Figma top-20, left-16, h-172, rounded-4 */}
-              <div style={{ position: "absolute", top: 20, left: 16, right: 16, height: 172, borderRadius: 4, overflow: "hidden" }}>
-                <ThumbnailPlaceholder bgColor={card.imageBg} strokeColor={card.textColor} height="100%" iconSize={28} />
-              </div>
+        {/* Content area: top-212, left-16 */}
+        <div style={{ position: "absolute", top: 212, left: 16, right: 16 }}>
+          {/* Category tags */}
+          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+            <p className="font-inclusive-sans font-medium uppercase" style={{ fontSize: 12, letterSpacing: "0.48px", color: "#212012" }}>UX + UI</p>
+            <div style={{ width: 4, height: 4, borderRadius: "50%", backgroundColor: "#212012", opacity: 0.5, flexShrink: 0 }} />
+            <p className="font-inclusive-sans font-medium uppercase" style={{ fontSize: 12, letterSpacing: "0.48px", color: "#212012" }}>Sole designer</p>
+          </div>
 
-              {/* Content area: top-212, left-16 */}
-              <div style={{ position: "absolute", top: 212, left: 16, right: 16 }}>
-                {/* Category tags */}
-                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4, opacity: i === 0 ? 1 : 0.5 }}>
-                  <p className="font-jakarta font-medium uppercase" style={{ fontSize: 12, letterSpacing: "0.48px", color: "#212012" }}>UX + UI</p>
-                  <div style={{ width: 4, height: 4, borderRadius: "50%", backgroundColor: "#212012", opacity: 0.5, flexShrink: 0 }} />
-                  <p className="font-jakarta font-medium uppercase" style={{ fontSize: 12, letterSpacing: "0.48px", color: "#212012" }}>Sole designer</p>
-                </div>
+          {/* Title */}
+          <p className="font-caslon not-italic" style={{ fontSize: 22, lineHeight: "28px", color: "#212012", fontWeight: 600, marginBottom: 12 }}>
+            {card.cardTitle}
+          </p>
 
-                {/* Title */}
-                <p className="font-caslon not-italic" style={{ fontSize: 22, lineHeight: "28px", color: "#212012", fontWeight: 600, marginBottom: 12 }}>
-                  {card.cardTitle}
-                </p>
-
-                {/* Status */}
-                <p className="font-jakarta font-medium uppercase" style={{ fontSize: 12, letterSpacing: "0.48px", color: i === 0 ? card.statusColor : "#212012" }}>
-                  {card.statusText}
-                </p>
-              </div>
-            </div>
-          </motion.div>
-        ))}
+          {/* Status */}
+          <p className="font-inclusive-sans font-medium uppercase" style={{ fontSize: 12, letterSpacing: "0.48px", color: card.statusColor }}>
+            {card.statusText}
+          </p>
+        </div>
       </div>
     </div>
   );
@@ -438,6 +412,8 @@ export function ProjectsSection({ onDrawerChange }: { onDrawerChange?: (open: bo
 
   const card2Y = useMotionValue(typeof window !== "undefined" ? window.innerHeight - DARK_H : 620);
   const card3Y = useMotionValue(typeof window !== "undefined" ? window.innerHeight - DARK_H : 620);
+  const mobileCard2Y = useMotionValue(typeof window !== "undefined" ? window.innerHeight - MOBILE_DARK_H : 620);
+  const mobileCard3Y = useMotionValue(typeof window !== "undefined" ? window.innerHeight - MOBILE_DARK_H : 620);
 
   useEffect(() => {
     const update = (v: number) => {
@@ -446,6 +422,10 @@ export function ProjectsSection({ onDrawerChange }: { onDrawerChange?: (open: bo
       card2Y.set(offY + (14 - offY) * t2);
       const t3 = v <= 0.5 ? 0 : v >= 0.9 ? 1 : (v - 0.5) / 0.4;
       card3Y.set(offY + (28 - offY) * t3);
+
+      const mobileOffY = window.innerHeight - MOBILE_DARK_H;
+      mobileCard2Y.set(mobileOffY + (14 - mobileOffY) * t2);
+      mobileCard3Y.set(mobileOffY + (28 - mobileOffY) * t3);
     };
 
     const onResize = () => update(scrollYProgress.get());
@@ -457,13 +437,50 @@ export function ProjectsSection({ onDrawerChange }: { onDrawerChange?: (open: bo
       unsubScroll();
       window.removeEventListener("resize", onResize);
     };
-  }, [scrollYProgress, card2Y, card3Y]);
+  }, [scrollYProgress, card2Y, card3Y, mobileCard2Y, mobileCard3Y]);
 
   if (isMobile) {
     return (
       <>
         <CaseStudyDetail caseStudy={selectedCase} onClose={closeCase} onNavigate={openCase} />
-        <MobileCardList onSelect={openCase} />
+
+        <div
+          ref={outerRef}
+          style={{ height: `calc(100vh + ${EXTRA_SCROLL}px)`, position: "relative", overflow: "clip" }}
+        >
+          <div
+            style={{
+              position: "sticky",
+              top: 0,
+              height: "100vh",
+              overflow: "hidden",
+              backgroundColor: "#212012",
+              borderRadius: "16px",
+            }}
+          >
+            <p
+              className="font-caslon uppercase text-center"
+              style={{ position: "absolute", top: 24, left: 0, right: 0, color: "#e3d9ce", fontSize: 24, lineHeight: "30px" }}
+            >
+              select projects
+            </p>
+
+            {/* CS1 */}
+            <div style={{ position: "absolute", top: MOBILE_DARK_H, left: 10, right: 10, zIndex: 1 }}>
+              <MobileStackCard card={CARDS[0]} align={TAB_ALIGN[0]} onClick={() => openCase(CASE_STUDY_DATA[0])} />
+            </div>
+
+            {/* CS2 */}
+            <motion.div style={{ position: "absolute", top: MOBILE_DARK_H, left: 10, right: 10, zIndex: 2, y: mobileCard2Y }}>
+              <MobileStackCard card={CARDS[1]} align={TAB_ALIGN[1]} onClick={() => openCase(CASE_STUDY_DATA[1])} />
+            </motion.div>
+
+            {/* CS3 */}
+            <motion.div style={{ position: "absolute", top: MOBILE_DARK_H, left: 10, right: 10, zIndex: 3, y: mobileCard3Y }}>
+              <MobileStackCard card={CARDS[2]} align={TAB_ALIGN[2]} onClick={() => openCase(CASE_STUDY_DATA[2])} />
+            </motion.div>
+          </div>
+        </div>
       </>
     );
   }

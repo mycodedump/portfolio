@@ -148,10 +148,10 @@ function PostCard({
     >
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
         <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-          <p className="font-jakarta" style={{ fontSize: 12, color: "#625e37", opacity: 0.7 }}>
+          <p className="font-inclusive-sans" style={{ fontSize: 12, color: "#625e37", opacity: 0.7 }}>
             {post.date}
           </p>
-          <p className="font-jakarta" style={{ fontSize: 12, color: "#625e37", opacity: 0.5 }}>
+          <p className="font-inclusive-sans" style={{ fontSize: 12, color: "#625e37", opacity: 0.5 }}>
             {post.readTime}
           </p>
         </div>
@@ -175,7 +175,7 @@ function PostCard({
         {post.title}
       </p>
       <p
-        className="font-jakarta"
+        className="font-inclusive-sans"
         style={{ fontSize: 14, lineHeight: "20px", color: "#625e37", opacity: 0.8 }}
       >
         {post.subtitle}
@@ -195,10 +195,10 @@ function PostBody({ post }: { post: BlogPost }) {
     >
       <div style={{ marginBottom: 24 }}>
         <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 16 }}>
-          <p className="font-jakarta" style={{ fontSize: 12, color: "#625e37", opacity: 0.7 }}>
+          <p className="font-inclusive-sans" style={{ fontSize: 12, color: "#625e37", opacity: 0.7 }}>
             {post.date}
           </p>
-          <p className="font-jakarta" style={{ fontSize: 12, color: "#625e37", opacity: 0.5 }}>
+          <p className="font-inclusive-sans" style={{ fontSize: 12, color: "#625e37", opacity: 0.5 }}>
             {post.readTime}
           </p>
         </div>
@@ -209,7 +209,7 @@ function PostBody({ post }: { post: BlogPost }) {
           {post.title}
         </p>
         <p
-          className="font-jakarta"
+          className="font-inclusive-sans"
           style={{ fontSize: 16, lineHeight: "24px", color: "#625e37" }}
         >
           {post.subtitle}
@@ -232,7 +232,7 @@ function PostBody({ post }: { post: BlogPost }) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-40px" }}
             transition={{ duration: 0.5, delay: i * 0.06, ease: [0.16, 1, 0.3, 1] }}
-            className="font-jakarta"
+            className="font-inclusive-sans"
             style={{ fontSize: 16, lineHeight: "28px", color: "#212012", opacity: 0.85 }}
           >
             {para}
@@ -267,10 +267,10 @@ function PostBody({ post }: { post: BlogPost }) {
           </p>
         </div>
         <div>
-          <p className="font-jakarta font-semibold" style={{ fontSize: 14, color: "#212012" }}>
+          <p className="font-inclusive-sans font-semibold" style={{ fontSize: 14, color: "#212012" }}>
             Laxmi Mahajan
           </p>
-          <p className="font-jakarta" style={{ fontSize: 12, color: "#625e37", opacity: 0.7 }}>
+          <p className="font-inclusive-sans" style={{ fontSize: 12, color: "#625e37", opacity: 0.7 }}>
             UX designer · Bangalore
           </p>
         </div>
@@ -396,7 +396,7 @@ export function BlogDetail({ open, onClose }: BlogDetailProps) {
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                       <path d="M10 3L5 8L10 13" stroke="#625e37" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
-                    <p className="font-jakarta" style={{ fontSize: 13, color: "#625e37" }}>
+                    <p className="font-inclusive-sans" style={{ fontSize: 13, color: "#625e37" }}>
                       all posts
                     </p>
                   </motion.button>
@@ -443,7 +443,7 @@ export function BlogDetail({ open, onClose }: BlogDetailProps) {
                         }}
                       >
                         <p
-                          className="font-jakarta font-medium"
+                          className="font-inclusive-sans font-medium"
                           style={{
                             fontSize: 11,
                             color: activeChip === chip ? "#e3d9ce" : "#625e37",
@@ -457,7 +457,7 @@ export function BlogDetail({ open, onClose }: BlogDetailProps) {
                   </div>
 
                   <p
-                    className="font-jakarta"
+                    className="font-inclusive-sans"
                     style={{ fontSize: 12, color: "#625e37", opacity: 0.5, padding: "12px 0 4px" }}
                   >
                     {filteredPosts.length} post{filteredPosts.length !== 1 ? "s" : ""}

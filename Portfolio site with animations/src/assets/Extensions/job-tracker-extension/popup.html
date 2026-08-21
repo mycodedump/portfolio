@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Job Hunt Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div class="popup">
+    <header class="popup-header">
+      <img class="mark" src="icons/logo.svg" alt="" />
+      <div class="brand">
+        <span class="brand-name">Job Hunt Tracker</span>
+        <span class="brand-sub">capture &amp; review before you apply</span>
+      </div>
+    </header>
+
+    <main id="content" class="content">
+      <!-- state renders here -->
+      <div class="skeleton">
+        <div class="skeleton-line w80"></div>
+        <div class="skeleton-line w60"></div>
+      </div>
+    </main>
+
+    <footer class="popup-footer">
+      <button id="dashboardBtn" class="link-btn">Open dashboard →</button>
+    </footer>
+  </div>
+
+  <script src="store.js"></script>
+  <script src="page-capture.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

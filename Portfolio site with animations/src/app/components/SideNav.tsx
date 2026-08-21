@@ -7,7 +7,7 @@ import {
   AnimatePresence,
 } from "motion/react";
 
-export type NavSection = "home" | "projects" | "ai-playground" | "tinkering";
+export type NavSection = "home" | "projects" | "ai-playground" | "about";
 export type { NavSection as SideNavSection };
 
 // ── SVG paths ──────────────────────────────────────────────────────────────────
@@ -208,7 +208,7 @@ function ResumeButton() {
         />
         {/* "Resume" — no copy change; text reduced to 12px */}
         <span
-          className="font-jakarta font-medium uppercase"
+          className="font-inclusive-sans font-normal uppercase"
           style={{
             position: "relative", zIndex: 1,
             fontSize: 12,
@@ -338,7 +338,7 @@ export function SideNav({ activeSection, onNavigate, onAboutOpen }: SideNavProps
               <motion.button
                 key={item.id}
                 onClick={() => onNavigate(item.id)}
-                className={isActive ? "font-caslon not-italic" : "font-jakarta font-medium uppercase"}
+                className={isActive ? "font-caslon not-italic" : "font-inclusive-sans font-normal uppercase"}
                 style={{
                   // Fixed row height keeps item tops at exact NAV_Y row positions.
                   // Text is centred vertically inside via alignItems.
